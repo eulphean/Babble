@@ -17,6 +17,8 @@ var giphy;
 
 // Canvas control. 
 var canvas; 
+var indicesToUpdate = [];
+var newUrls = [];
 
 function setup() {
   canvas = createCanvas(screen.width, screen.height);
@@ -31,24 +33,13 @@ function setup() {
   //Setup parent gif. 
   parentDiv = createDiv();
   parentDiv.mousePressed(onClick);
-
+  
   // Initialize the gif wall elements. 
-  for (let x = 0; x < numCols; x++) {
-    for (let y = 0; y < numRows; y++) {
-      // <img> element with empty content. 
-      var img = createImg(); 
-      img.size(gifWidth, gifHeight);
-      img.position(x*gifWidth, y*gifHeight);
-      img.parent(parentDiv); // Parent div is the root container. 
-      
-      var idx = x + numCols * y; 
-      gifElements[idx] = img; 
-    }
-  }
+  initGifWall();
 
   // Create the controller instance. 
   giphy = new Giphy(numCols*numRows);
-  queryGifs();
+  queryGifs(giphyData);
 
   // Center div
   initCenterDiv();
@@ -60,6 +51,21 @@ function draw() {
   // All updates here. 
   if (numResults == 0) {
     centerText.html("Sorry no results found");
+  }
+}
+
+function initGifWall() {
+  for (let x = 0; x < numCols; x++) {
+    for (let y = 0; y < numRows; y++) {
+      // <img> element with empty content. 
+      var img = createElement('img', ""); 
+      img.size(gifWidth, gifHeight);
+      img.position(x*gifWidth, y*gifHeight);
+      img.parent(parentDiv); // Parent div is the root container. 
+      
+      var idx = x + numCols * y; 
+      gifElements[idx] = img; 
+    }
   }
 }
 
@@ -83,25 +89,55 @@ function windowResized() {
 }
 
 function onClick() {
-  queryGifs();
+  queryGifs(selective);
 }
 
-function queryGifs() {
+function selective(gData) {
+  for (let i = 0; i < 5; i++) {
+    var idx; 
+    do {
+      idx = floor(random(gifElements.length));
+    } while (indicesToUpdate.includes(idx));
+    indicesToUpdate.push(idx);
+  }
+
+  print(indicesToUpdate);
+  
+  for (var i = 0; i < indicesToUpdate.length; i++) { 
+    // Store new URLs.
+    newUrls.push(gData.data[i].images.fixed_width_downsampled.url);
+
+    var idx = indicesToUpdate[i]; 
+    gifElements[idx].attribute('src', '../assets/bars.gif');
+  }
+
+  // Timeout for a function. 
+  setTimeout(setNewGifs, 2000);
+}
+
+function setNewGifs() {
+  for (var i = 0; i < indicesToUpdate.length; i++) { 
+    var idx = indicesToUpdate[i]; 
+    var newUrl = newUrls[i];
+    gifElements[idx].attribute('src', newUrl);
+  }
+
+  // Clear old indices. 
+  indicesToUpdate = [];
+}
+
+function queryGifs(callback) {
   // Query gifs.
   let randIdx = floor(random(search.length));
-  giphy.query(search[randIdx], giphyData);
+  giphy.query(search[randIdx], callback);
 }
 
 // Callback function called when the service returns the result. 
 function giphyData(gData) {
-  print("Data received.");
-  print(gData); 
   numResults = gData.data.length; 
-  print("Results: " + numResults)
 
-  // Populate first 5 inces
-  for (let i = 0; i < 100; i++) {
-    var gifUrl = gData.data[i].images.fixed_width_small_still.url; 
+  for (let i = 0; i < numResults; i++) {
+    var gifUrl = gData.data[i].images.fixed_width_downsampled.url; 
     gifElements[i].attribute('src', gifUrl);
   }
 }
