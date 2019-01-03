@@ -6,26 +6,63 @@ var numGifs = numRows = 10; // # gifs/row and # of rows.
 var divs = [];
 var parentDiv; 
 var gifWidth, gifHeight; 
+var numResults; 
 
 // API Controller. 
 var giphy; 
 
+// Canvas control. 
+var canvas; 
+
 function setup() {
-  noCanvas();
+  canvas = createCanvas(screen.width, screen.height);
+  canvas.position(0, 0);
+  canvas.style('z-index', -1);
 
   // Create the controller instance. 
   giphy = new Giphy();
   queryGifs();
 
-  // Setup parent gif. 
+  //Setup parent gif. 
   parentDiv = createDiv();
-  parentDiv.mousePressed(onClick)
+  parentDiv.mousePressed(onClick);
 
   // Gif dimensions
   gifWidth = screen.width/numGifs; 
   gifHeight = screen.height/numGifs; 
+
+
+  // Center div
+  initCenterDiv();
 }
 
+function draw() {
+  background(0);
+  
+  // All updates here. 
+  if (numResults == 0) {
+    centerText.html("Sorry no results found");
+  }
+}
+
+function initCenterDiv() {
+  centerText = createElement('h2', 'This is an HTML string with style!');
+  centerText.position(0, screen.height/2 - 40);
+  centerText.style("font-family", "Serif");
+  centerText.style("background-color", "#FFFFFF");
+  centerText.style("color", "#000000");
+  centerText.style("padding", "10px");
+}
+
+function centerCanvas() {
+  var x = (windowWidth - width) / 2;
+  var y = (windowHeight - height) / 2;
+  canvas.position(x, y);
+}
+
+function windowResized() {
+  centerCanvas();
+}
 
 function onClick() {
   print("Removing old divs.");
@@ -56,6 +93,8 @@ function queryGifs() {
 function giphyData(gData) {
   print("Data received.");
   print(gData); 
+  numResults = gData.data.length; 
+  print("Results: " + numResults)
 
   createDivs(); 
   showImages(gData);
