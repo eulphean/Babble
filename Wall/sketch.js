@@ -1,5 +1,5 @@
 // Hardcoded text for now. 
-var search = ["lalaland", "sexy", "kiss", "pyar", "humtum", "whatsup", "whatsapp", "internet", "machines", "you"];
+var search = ["lalaland", "sexy", "kiss", "pyar", "whatsup", "whatsapp", "internet", "machines", "you"];
 
 // Display.
 var numGifs = numRows = 10; // # gifs/row and # of rows.  
@@ -17,10 +17,11 @@ var canvas;
 function setup() {
   canvas = createCanvas(screen.width, screen.height);
   canvas.position(0, 0);
+  canvas.style('display', 'block');
   canvas.style('z-index', -1);
 
   // Create the controller instance. 
-  giphy = new Giphy();
+  giphy = new Giphy(numGifs*numRows);
   queryGifs();
 
   //Setup parent gif. 
@@ -46,7 +47,7 @@ function draw() {
 }
 
 function initCenterDiv() {
-  centerText = createElement('h2', 'This is an HTML string with style!');
+  centerText = createElement('h2', 'GIF WALL');
   centerText.position(0, screen.height/2 - 40);
   centerText.style("font-family", "Serif");
   centerText.style("background-color", "#FFFFFF");
@@ -97,12 +98,13 @@ function giphyData(gData) {
   print("Results: " + numResults)
 
   createDivs(); 
-  showImages(gData);
+  //showImages(gData);
+  showGifs(gData);
 }
 
 function showImages(gData) {
   // Only show the number of search results not all the ones I need to show
-  print("show images");
+  print("Show images.");
   var divNum = 0; var numImages = gData.data.length;
   for (var i = 0; i < numImages; i++) {
     var img = createImg(gData.data[i].images.fixed_width_small_still.url);
@@ -119,16 +121,21 @@ function showImages(gData) {
   }
 }
 
-/*
-function populateGifs() {
-  print("populating gifs");
+function showGifs(gData) {
+  print("Show gifs.");
   // Create a collection of giphys
-  var divNum = 0; 
+  var divNum = 0; var numImages = gData.data.length;
+  for (var i = 0; i < 50; i++) {
+    img = createElement('img', "a"); 
+    // img = createImg(gData.data[i].images.fixed_width_downsampled.url, function () {
+    //   //print("Vid ready");
+    //   //print (img);
+    // });  // fixed_width_downsampled = gif reduced to 6 frames. (The most downsampled GIF)
 
-  for (var i = 0; i < numRows * numGif; i++) {
-    img = createImg(g.data[i].images.fixed_width.url);
+    img.attribute('src', gData.data[i].images.fixed_width_downsampled.url);
     img.size(gifWidth, gifHeight);
-    divs[divNum].child(img);
+     divs[divNum].child(img);
+
 
     var mod = i % numRows; 
     if (mod == 9) {
@@ -136,4 +143,3 @@ function populateGifs() {
     }
   }
 }
-*/
