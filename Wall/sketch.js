@@ -2,11 +2,15 @@
 var search = ["lalaland", "sexy", "kiss", "pyar", "whatsup", "whatsapp", "internet", "machines", "you"];
 
 // Display.
-var numGifs = numRows = 10; // # gifs/row and # of rows.  
-var divs = [];
+var numCols = numRows = 10; // # gifs/row and # of rows.  
 var parentDiv; 
-var gifWidth, gifHeight; 
-var numResults; 
+var gifWidth, gifHeight;  
+var gifElements = []; 
+
+// Parent div
+// All gifs are absolutely positioned in this parent. 
+
+var numResults;
 
 // API Controller. 
 var giphy; 
@@ -20,18 +24,31 @@ function setup() {
   canvas.style('display', 'block');
   canvas.style('z-index', -1);
 
-  // Create the controller instance. 
-  giphy = new Giphy(numGifs*numRows);
-  queryGifs();
+  // Gif dimensions
+  gifWidth = screen.width/numCols; 
+  gifHeight = screen.height/numRows; 
 
   //Setup parent gif. 
   parentDiv = createDiv();
   parentDiv.mousePressed(onClick);
 
-  // Gif dimensions
-  gifWidth = screen.width/numGifs; 
-  gifHeight = screen.height/numGifs; 
+  // Initialize the gif wall elements. 
+  for (let x = 0; x < numCols; x++) {
+    for (let y = 0; y < numRows; y++) {
+      // <img> element with empty content. 
+      var img = createImg(); 
+      img.size(gifWidth, gifHeight);
+      img.position(x*gifWidth, y*gifHeight);
+      img.parent(parentDiv); // Parent div is the root container. 
+      
+      var idx = x + numCols * y; 
+      gifElements[idx] = img; 
+    }
+  }
 
+  // Create the controller instance. 
+  giphy = new Giphy(numCols*numRows);
+  queryGifs();
 
   // Center div
   initCenterDiv();
@@ -66,22 +83,7 @@ function windowResized() {
 }
 
 function onClick() {
-  print("Removing old divs.");
-  for (var i = 0; i < divs.length; i++) {
-    divs[i].remove();
-  }
   queryGifs();
-}
-
-function createDivs() {
-  print("Creating Divs. ");
-  // Create all the divs. 
-  for (var i = 0; i < numRows; i++) {
-    var div = createDiv();
-    div.position(0, i*gifHeight);
-    divs[i] = div;
-    parentDiv.child(divs[i]);
-  }
 }
 
 function queryGifs() {
@@ -97,49 +99,9 @@ function giphyData(gData) {
   numResults = gData.data.length; 
   print("Results: " + numResults)
 
-  createDivs(); 
-  //showImages(gData);
-  showGifs(gData);
-}
-
-function showImages(gData) {
-  // Only show the number of search results not all the ones I need to show
-  print("Show images.");
-  var divNum = 0; var numImages = gData.data.length;
-  for (var i = 0; i < numImages; i++) {
-    var img = createImg(gData.data[i].images.fixed_width_small_still.url);
-    img.size(gifWidth, gifHeight);
-
-    // Add image in the div. 
-    divs[divNum].child(img);
-
-    var mod = i % 10; 
-    if (mod == 9) {
-      print(divNum + ": Next row"); 
-      divNum++; 
-    }
-  }
-}
-
-function showGifs(gData) {
-  print("Show gifs.");
-  // Create a collection of giphys
-  var divNum = 0; var numImages = gData.data.length;
-  for (var i = 0; i < 50; i++) {
-    img = createElement('img', "a"); 
-    // img = createImg(gData.data[i].images.fixed_width_downsampled.url, function () {
-    //   //print("Vid ready");
-    //   //print (img);
-    // });  // fixed_width_downsampled = gif reduced to 6 frames. (The most downsampled GIF)
-
-    img.attribute('src', gData.data[i].images.fixed_width_downsampled.url);
-    img.size(gifWidth, gifHeight);
-     divs[divNum].child(img);
-
-
-    var mod = i % numRows; 
-    if (mod == 9) {
-      divNum++; 
-    }
+  // Populate first 5 inces
+  for (let i = 0; i < 100; i++) {
+    var gifUrl = gData.data[i].images.fixed_width_small_still.url; 
+    gifElements[i].attribute('src', gifUrl);
   }
 }
