@@ -1,5 +1,5 @@
 // Hardcoded text for now. 
-var search = ["lalaland", "sexy", "kiss", "pyar", "whatsup", "whatsapp", "internet", "machines", "you"];
+var search = ["freak", "words", "how+i+want", "love", "anger", "i+am+a+phrase", "lets+go", "machines", "us"];
 
 // Display.
 var numCols = numRows = 10; // # gifs/row and # of rows.  
