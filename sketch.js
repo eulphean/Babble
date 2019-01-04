@@ -7,18 +7,19 @@ var parentDiv;
 var gifWidth, gifHeight;  
 var gifElements = []; 
 
-// Parent div
-// All gifs are absolutely positioned in this parent. 
-
-var numResults;
-
 // API Controller. 
 var giphy; 
+var speech;
 
 // Canvas control. 
 var canvas; 
 var indicesToUpdate = [];
 var newUrls = [];
+var randomPosition;
+
+var floatingText; 
+var velocity; 
+var position; 
 
 function setup() {
   canvas = createCanvas(screen.width, screen.height);
@@ -32,26 +33,41 @@ function setup() {
 
   //Setup parent gif. 
   parentDiv = createDiv();
-  parentDiv.mousePressed(onClick);
   
   // Initialize the gif wall elements. 
   initGifWall();
 
   // Create the controller instance. 
   giphy = new Giphy(numCols*numRows);
-  queryGifs(giphyData);
 
-  // Center div
-  initCenterDiv();
+  // TODO: Call the trending api for the initial population of GIFs. 
+  var idx = floor(random(search.length));
+  queryGifs(search[idx], trending);
+
+  // Initialize speech recognizer
+  speech = new Speech(speechResult);
+
+  position = createVector(screen.width/2, screen/height/2);
+  velocity = createVector(random(-1, 1), random(-1, 1));
+  randomPosition = createVector(random(screen.width), random(screen.height));
+
+    // Center div
+    initCenterDiv();
 }
 
 function draw() {
   background(0);
-  
-  // All updates here. 
-  if (numResults == 0) {
-    centerText.html("Sorry no results found");
-  }
+
+  // Calculate the new position
+  position.add(velocity);
+  //floatingText.position(position.x, position.y);
+}
+
+// Results from the Speech recognition algorithms. 
+function speechResult(result) {
+  floatingText.html(result);
+  // Clean this data and send it to query gifs. 
+  queryGifs(result, selectiveUpdate)
 }
 
 function initGifWall() {
@@ -70,12 +86,12 @@ function initGifWall() {
 }
 
 function initCenterDiv() {
-  centerText = createElement('h2', 'GIF WALL');
-  centerText.position(0, screen.height/2 - 40);
-  centerText.style("font-family", "Serif");
-  centerText.style("background-color", "#FFFFFF");
-  centerText.style("color", "#000000");
-  centerText.style("padding", "10px");
+  floatingText = createElement('h2', 'GIF INVASION');
+  floatingText.position(100, screen.height/2);
+  floatingText.style("font-family", "Serif");
+  floatingText.style("background-color", "red");
+  floatingText.style("color", "white");
+  floatingText.style("padding", "10px");
 }
 
 function centerCanvas() {
@@ -88,11 +104,7 @@ function windowResized() {
   centerCanvas();
 }
 
-function onClick() {
-  queryGifs(selective);
-}
-
-function selective(gData) {
+function selectiveUpdate(gData) {
   for (let i = 0; i < 5; i++) {
     var idx; 
     do {
@@ -105,10 +117,11 @@ function selective(gData) {
   
   for (var i = 0; i < indicesToUpdate.length; i++) { 
     // Store new URLs.
-    newUrls.push(gData.data[i].images.fixed_width_downsampled.url);
+    var newUrl = gData.data[i].images.fixed_width_downsampled.url; 
+    newUrls.push(newUrl);
 
     var idx = indicesToUpdate[i]; 
-    gifElements[idx].attribute('src', '../assets/bars.gif');
+    gifElements[idx].attribute('src', 'assets/bars.gif');
   }
 
   // Timeout for a function. 
@@ -124,16 +137,15 @@ function setNewGifs() {
 
   // Clear old indices. 
   indicesToUpdate = [];
+  newUrls = [];
 }
 
-function queryGifs(callback) {
-  // Query gifs.
-  let randIdx = floor(random(search.length));
-  giphy.query(search[randIdx], callback);
+function queryGifs(searchText, callback) {
+  giphy.query(searchText, callback);
 }
 
-// Callback function called when the service returns the result. 
-function giphyData(gData) {
+// Callback functions for the initial set of gifs. 
+function trending(gData) {
   numResults = gData.data.length; 
 
   for (let i = 0; i < numResults; i++) {

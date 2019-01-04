@@ -305,6 +305,9 @@
     // out potentially bogus recognition tokens.
     this.resultConfidence; 
 
+    // Is this the final result from the sequence of utterances made? 
+    this.isFinal; 
+
     var that = this; // some bullshit
 
     // onresult() fires automatically when the recognition engine
@@ -319,6 +322,7 @@
       // store latest result in top-level object struct
       that.resultString = e.results[e.results.length-1][0].transcript.trim();
       that.resultConfidence = e.results[e.results.length-1][0].confidence;
+      that.isFinal = e.results[e.results.length-1].isFinal; 
       if(that.onResult!=undefined) that.onResult();
     };
 
