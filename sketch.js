@@ -6,6 +6,8 @@ var gifWidth, gifHeight;
 var gifElements = []; 
 var minGifsToUpdate = 5; 
 var maxGifsToUpdate = 15; // Maximum gifs a search query can update on the wall. 
+var bgColors = [];
+var searchIcons = ['magnify1.gif', 'magnify2.gif', 'magnify3.gif', 'magnify4.gif', 'magnify5.gif'];
 
 // API Controllers. 
 var giphy; var searchGifLimit = 20;
@@ -21,6 +23,8 @@ var velocity;
 var position; 
 
 function setup() {
+  noStroke(); 
+
   canvas = createCanvas(screen.width, screen.height);
   canvas.position(0, 0);
   canvas.style('display', 'block');
@@ -48,10 +52,35 @@ function setup() {
   position = createVector(screen.width/2, screen/height/2);
   velocity = createVector(random(-1, 1), random(-1, 1));
   randomPosition = createVector(random(screen.width), random(screen.height));
+
+  // Create background colors
+  for (var x = 0; x < numCols; x++) {
+    for (var y = 0; y < numRows; y++) {
+      var idx = x + numCols*y; 
+      var prob = random(1); 
+      if (prob < 0.2) {
+        bgColors[idx] = color('#E4572E');
+      } else if (prob < 0.4) {
+        bgColors[idx] = color('#A3D4DF');
+      } else if (prob < 0.6) {
+        bgColors[idx] = color('#DB3A34');
+      } else if (prob < 0.8) {
+        bgColors[idx] = color('#15ADAA');
+      } else {
+        bgColors[idx] = color('#FFC914');
+      }
+    }
+  }
 }
 
 function draw() {
-  background(0);
+  for (var x = 0; x < numCols; x++) {
+    for (var y = 0; y < numRows; y++) {
+      var idx = x + y*numCols;
+      fill(bgColors[idx]);
+      rect(x*gifWidth, y*gifHeight, gifWidth, gifHeight);
+    }
+  }
 
   // Calculate the new position
   position.add(velocity);
@@ -88,7 +117,9 @@ function searchResults(gData) {
     } while (newIdxUrls.hasOwnProperty(idx));
 
     // Clear the div at that index. 
-    gifElements[idx].attribute('src', 'assets/bars.gif');
+    let randIconIdx = floor(random(searchIcons.length));
+    let iconString = 'assets/' + searchIcons[randIconIdx];
+    gifElements[idx].attribute('src', iconString);
 
     // Create an object {index: url} to update in setNewGifs method. 
     var gifUrl = gData.data[i].images.fixed_width_downsampled.url;
