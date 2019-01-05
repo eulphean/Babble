@@ -17,14 +17,13 @@ var speech;
 var newIdxUrls = [];
 var randomPosition;
 
-// Experimental. 
-var floatingText; 
-var velocity; 
-var position; 
+// Center title 
+var centerTitle; 
 
 function setup() {
   noStroke(); 
 
+  // Canvas setup. 
   canvas = createCanvas(screen.width, screen.height);
   canvas.position(0, 0);
   canvas.style('display', 'block');
@@ -41,39 +40,23 @@ function setup() {
   initGifWall();
 
   // Create the controller instance. 
-  giphy = new Giphy(numCols*numRows);
+  giphy = new Giphy();
   giphy.trending(numRows*numCols, trending);
 
-  // Initialize speech recognizer
-  speech = new Speech(speechResult);
-
-  // Center div
-  initCenterDiv();
-  position = createVector(screen.width/2, screen/height/2);
-  velocity = createVector(random(-1, 1), random(-1, 1));
-  randomPosition = createVector(random(screen.width), random(screen.height));
-
   // Create background colors
-  for (var x = 0; x < numCols; x++) {
-    for (var y = 0; y < numRows; y++) {
-      var idx = x + numCols*y; 
-      var prob = random(1); 
-      if (prob < 0.2) {
-        bgColors[idx] = color('#E4572E');
-      } else if (prob < 0.4) {
-        bgColors[idx] = color('#A3D4DF');
-      } else if (prob < 0.6) {
-        bgColors[idx] = color('#DB3A34');
-      } else if (prob < 0.8) {
-        bgColors[idx] = color('#15ADAA');
-      } else {
-        bgColors[idx] = color('#FFC914');
-      }
-    }
-  }
+  initBgColors();
+
+  // Initialize the center title 
+  centerTitle = new CenterTitle(); 
 }
 
+  // Initialize speech recognizer
+  function initSpeech() {
+    speech = new Speech(speechResult); 
+  }
+
 function draw() {
+  // Draw background. 
   for (var x = 0; x < numCols; x++) {
     for (var y = 0; y < numRows; y++) {
       var idx = x + y*numCols;
@@ -82,9 +65,12 @@ function draw() {
     }
   }
 
-  // Calculate the new position
-  position.add(velocity);
-  //floatingText.position(position.x, position.y);
+  if (centerTitle.animating) {
+    // Init speech when the animation completes. 
+    centerTitle.animate(initSpeech);
+  } else {
+    centerTitle.oscillate();
+  }
 }
 
 // Callback functions for trending gifs. 
@@ -98,7 +84,7 @@ function trending(gData) {
 
 // Results from the Speech recognition algorithm. 
 function speechResult(result) {
-  floatingText.html(result);
+  centerTitle.updateText(result);
   giphy.search(result, searchGifLimit, searchResults);
 }
 
@@ -139,6 +125,26 @@ function setNewGifs() {
   newIdxUrls = [];
 }
 
+function initBgColors() {
+  for (var x = 0; x < numCols; x++) {
+    for (var y = 0; y < numRows; y++) {
+      var idx = x + numCols*y; 
+      var prob = random(1); 
+      if (prob < 0.2) {
+        bgColors[idx] = color('#E4572E');
+      } else if (prob < 0.4) {
+        bgColors[idx] = color('#A3D4DF');
+      } else if (prob < 0.6) {
+        bgColors[idx] = color('#DB3A34');
+      } else if (prob < 0.8) {
+        bgColors[idx] = color('#15ADAA');
+      } else {
+        bgColors[idx] = color('#FFC914');
+      }
+    }
+  }
+}
+
 function initGifWall() {
   for (let x = 0; x < numCols; x++) {
     for (let y = 0; y < numRows; y++) {
@@ -152,15 +158,6 @@ function initGifWall() {
       gifElements[idx] = img; 
     }
   }
-}
-
-function initCenterDiv() {
-  floatingText = createElement('h2', 'GIF INVASION');
-  floatingText.position(100, screen.height/2);
-  floatingText.style("font-family", "Serif");
-  floatingText.style("background-color", "red");
-  floatingText.style("color", "white");
-  floatingText.style("padding", "10px");
 }
 
 function centerCanvas() {
