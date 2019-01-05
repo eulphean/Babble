@@ -1,4 +1,4 @@
-// API controller for the Giphhy web service.
+// API controller for the Speech recognition web service. 
 class Speech {
     constructor(speechResult) {
         this.speechRec = new p5.SpeechRec('en-In', this.gotSpeech.bind(this));
