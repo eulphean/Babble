@@ -27,7 +27,7 @@ class CenterTitle {
         this.el.style('background-image', 'linear-gradient(to bottom right, #5E0000, #800000)');
         //this.el.style('background-color', '#800000');
         this.el.style("justify-content", "center");
-        this.el.style("text-align", "left");
+        this.el.style("text-align", "center");
         this.el.style("padding", "15px");
 
         // Voice text counter
@@ -54,7 +54,7 @@ class CenterTitle {
         if (d < 1) {
             print (this.curOpacity);
             this.animating = false;
-            this.el.html("SAY SOMETHING"); 
+            this.el.html("I'm Listening"); 
             initSpeechCbk(); // Initialize speech. 
         }
     }
@@ -68,26 +68,29 @@ class CenterTitle {
         // Check here when to revert back to the old text. 
         if (millis() - this.timer > 15000) { // 60 seconds
             this.el.style('font-size', '80px');
-            this.el.html("SAY SOMETHING");
+            this.el.html("I'm Listening");
         }
     }
 
     setVoiceText(text) {
         // Revisit this based on how things look. 
-        if (text.length > 10) {
+ 
+
+        var t = "Excellent. I heard you say '" + text + "'. Updating the wall.";
+
+        if (t.length > 10) {
             this.el.style('font-size', '60px');
         }
 
-        if (text.length > 15) {
+        if (t.length > 15) {
             this.el.style('font-size', '40px');
         }
 
-        if (text.length > 20) {
+        if (t.length > 20) {
             this.el.style('font-size', '20px');
         }
-
         // Update to new text and restart timer. 
-        this.el.html(text);
+        this.el.html(t);
         this.timer = millis();
     }
 };

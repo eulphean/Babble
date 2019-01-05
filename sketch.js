@@ -4,8 +4,8 @@ var numCols = numRows = 8; // # gifs/row and # of rows.
 var parentDiv; 
 var gifWidth, gifHeight;  
 var gifElements = []; 
-var minGifsToUpdate = 20; 
-var maxGifsToUpdate = 40; // Maximum gifs a search query can update on the wall. 
+var minGifsToUpdate = 15; 
+var maxGifsToUpdate = 25; // Maximum gifs a search query can update on the wall. 
 var bgColors = [];
 var searchIcons = ['magnify1.svg', 'magnify2.svg', 'magnify3.svg', 'magnify4.svg', 'magnify5.svg'];
 
