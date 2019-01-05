@@ -74,7 +74,7 @@ function initGifWall() {
   for (let x = 0; x < numCols; x++) {
     for (let y = 0; y < numRows; y++) {
       // <img> element with empty content. 
-      var img = createElement('img', ""); 
+      var img = createImg('assets/bars.gif'); 
       img.size(gifWidth, gifHeight);
       img.position(x*gifWidth, y*gifHeight);
       img.parent(parentDiv); // Parent div is the root container. 
