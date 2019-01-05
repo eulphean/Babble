@@ -84,7 +84,7 @@ function trending(gData) {
 
 // Results from the Speech recognition algorithm. 
 function speechResult(result) {
-  centerTitle.updateText(result);
+  centerTitle.setVoiceText(result);
   giphy.search(result, searchGifLimit, searchResults);
 }
 
