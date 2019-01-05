@@ -3,7 +3,7 @@ class CenterTitle {
         // Animating props. 
         this.animating = true; 
         this.curPos = createVector(0, 0);
-        this.finalPos = createVector(3*gifWidth, 4*gifHeight);
+        this.finalPos = createVector(2*gifWidth, 3*gifHeight);
 
         this.curSize = createVector(screen.width, screen.height);
         this.finalSize = createVector(4*gifWidth-30, 2*gifHeight-30);
@@ -12,7 +12,7 @@ class CenterTitle {
         this.finalOpacity = 0; 
 
         // Dom element. 
-        this.el = createElement('div', "GIF INVASION"); 
+        this.el = createElement('div', "BABBLE-GABBLE"); 
         this.el.position(this.curPos.x, this.curPos.y); 
         this.el.size(this.curSize.x, this.curSize.y);
 
@@ -20,13 +20,14 @@ class CenterTitle {
         this.el.style("opacity", this.curOpacity);
         this.el.style("font-family", 'Anton');
         this.el.style("letter-spacing", '10px');
-        this.el.style('font-size', '90px');
-        this.el.style("color", "white");
+        this.el.style('font-size', '70px');
+        this.el.style("color", "#ffbf00");
         this.el.style('display', 'flex');
         this.el.style("align-items", "center");
-        this.el.style('background-image', 'linear-gradient(to bottom right, #15ADAA, #FFC914)');
+        this.el.style('background-image', 'linear-gradient(to bottom right, #5E0000, #800000)');
+        //this.el.style('background-color', '#800000');
         this.el.style("justify-content", "center");
-        this.el.style("text-align", "justify");
+        this.el.style("text-align", "left");
         this.el.style("padding", "15px");
 
         // Voice text counter
@@ -61,20 +62,28 @@ class CenterTitle {
     oscillate() {
         // Do nothing right now. 
         var offset = 20*PI + this.curOpacity; 
-        var o = map(cos(frameCount/offset), -1, 1, 0.0, 0.98);
+        var o = map(cos(frameCount/offset), -1, 1, 0.0, 0.90);
         this.el.style('opacity', o);
 
         // Check here when to revert back to the old text. 
         if (millis() - this.timer > 15000) { // 60 seconds
-            this.el.style('font-size', '90px');
+            this.el.style('font-size', '80px');
             this.el.html("SAY SOMETHING");
         }
     }
 
     setVoiceText(text) {
         // Revisit this based on how things look. 
-        if (text.length > 20) {
+        if (text.length > 10) {
+            this.el.style('font-size', '60px');
+        }
+
+        if (text.length > 15) {
             this.el.style('font-size', '40px');
+        }
+
+        if (text.length > 20) {
+            this.el.style('font-size', '20px');
         }
 
         // Update to new text and restart timer. 

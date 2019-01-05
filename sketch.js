@@ -1,16 +1,16 @@
 // Display.
 var canvas; 
-var numCols = numRows = 10; // # gifs/row and # of rows.  
+var numCols = numRows = 8; // # gifs/row and # of rows.  
 var parentDiv; 
 var gifWidth, gifHeight;  
 var gifElements = []; 
-var minGifsToUpdate = 5; 
-var maxGifsToUpdate = 15; // Maximum gifs a search query can update on the wall. 
+var minGifsToUpdate = 20; 
+var maxGifsToUpdate = 40; // Maximum gifs a search query can update on the wall. 
 var bgColors = [];
-var searchIcons = ['magnify1.gif', 'magnify2.gif', 'magnify3.gif', 'magnify4.gif', 'magnify5.gif'];
+var searchIcons = ['magnify1.svg', 'magnify2.svg', 'magnify3.svg', 'magnify4.svg', 'magnify5.svg'];
 
 // API Controllers. 
-var giphy; var searchGifLimit = 20;
+var giphy; var searchGifLimit = maxGifsToUpdate;
 var speech;
 
 // Property to save indexes for future. 
@@ -22,6 +22,7 @@ var centerTitle;
 
 function setup() {
   noStroke(); 
+  noSmooth();
 
   // Canvas setup. 
   canvas = createCanvas(screen.width, screen.height);
@@ -91,9 +92,8 @@ function speechResult(result) {
 function searchResults(gData) {
   let numGifsReturned = gData.data.length; 
   print("Total gifs returned: " + numGifsReturned);
-  let minGifs = 5; 
   let maxGifs = numGifsReturned > maxGifsToUpdate ? maxGifsToUpdate : numGifsReturned; 
-  let numGifsToUpdate = numGifsReturned <= minGifs ? numGifsReturned : floor(random(minGifs, maxGifs + 1)); 
+  let numGifsToUpdate = numGifsReturned <= minGifsToUpdate ? numGifsReturned : floor(random(minGifsToUpdate, maxGifs + 1)); 
 
   print("Totals gifs updating: " + numGifsToUpdate);
   for (let i = 0; i < numGifsToUpdate; i++) {
@@ -112,11 +112,15 @@ function searchResults(gData) {
     newIdxUrls[idx] = gifUrl; 
   }
 
+  print("Done with search results");
+
   // Wait for some time, then load new gifs.  
-  setTimeout(setNewGifs, 2000);
+  setTimeout(setNewGifs, 5000);
 }
 
 function setNewGifs() {
+  print("Setting new gif");
+
   for (var idx in newIdxUrls) {
     var newUrl = newIdxUrls[idx]; 
     gifElements[idx].attribute('src', newUrl);
@@ -130,16 +134,14 @@ function initBgColors() {
     for (var y = 0; y < numRows; y++) {
       var idx = x + numCols*y; 
       var prob = random(1); 
-      if (prob < 0.2) {
-        bgColors[idx] = color('#E4572E');
-      } else if (prob < 0.4) {
-        bgColors[idx] = color('#A3D4DF');
-      } else if (prob < 0.6) {
-        bgColors[idx] = color('#DB3A34');
-      } else if (prob < 0.8) {
-        bgColors[idx] = color('#15ADAA');
+      if (prob < 0.25) {
+        bgColors[idx] = color('#972E2E');
+      } else if (prob < 0.5) {
+        bgColors[idx] = color('#FFD65C');
+      } else if (prob < 0.75) {
+        bgColors[idx] = color('#6FEDB7');
       } else {
-        bgColors[idx] = color('#FFC914');
+        bgColors[idx] = color('#55596A');
       }
     }
   }
@@ -149,7 +151,7 @@ function initGifWall() {
   for (let x = 0; x < numCols; x++) {
     for (let y = 0; y < numRows; y++) {
       // <img> element with empty content. 
-      var img = createImg('assets/bars.gif'); 
+      var img = createImg('assets/ring.svg'); 
       img.size(gifWidth, gifHeight);
       img.position(x*gifWidth, y*gifHeight);
       img.parent(parentDiv); // Parent div is the root container. 
