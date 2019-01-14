@@ -9,15 +9,19 @@ var gifWidth, gifHeight;
 var gifElements = []; 
 var minGifsToUpdate = 15; 
 var maxGifsToUpdate = 25; // Maximum gifs a search query can update on the wall. 
+var timeToWaitBeforeSpeaking = 5000; // 5 seconds. 
 var bgColors = [];
 var searchIcons = ['magnify1.svg', 'magnify2.svg', 'magnify3.svg', 'magnify4.svg', 'magnify5.svg'];
 var button;
 
-// API Controllers. 
+// APIs controllers. 
 var giphy; var searchGifLimit = maxGifsToUpdate;
 var speech;
 var voice; 
+
+// Sounds. 
 var whistle;
+var notifications;
 
 // Property to save indexes for future. 
 var newIdxUrls = [];
@@ -29,6 +33,8 @@ var centerTitle;
 function preload() {
   
   whistle = loadSound('assets/psst.m4a');
+  notification = loadSound('assets/notification2.wav');
+  notification.setVolume(0.5);
 }
 
 function setup() {
@@ -62,26 +68,39 @@ function setup() {
   centerTitle = new CenterTitle(); 
 
   // Initialize voice engine. 
-  voice = new VoiceSpeech(voiceLoaded, voiceStarted, voiceEnded)
-}
+  voice = new VoiceSpeech(voiceLoaded, voiceStarted, voiceEnded);
 
-// Initialize speech recognizer
-function initSpeech() {
+  // Initialize speech engine. 
   speech = new Speech(speechResult); 
 }
 
 function initVoice() {
-  // whistle.play();
-  speech = new Speech(speechResult); 
-  voice.utter('Hey! I am Babble. Come talk to me.');
+  notification.play();
+  // Turn off speech recognition deliberately if it's recognizing. 
+  if (speech != null) {
+    speech.stopDeliberately = true;
+    speech.speechRec.rec.stop();
+  }
+
+  // Utter the words. 
+  voice.utter('Hey! I am Babble.');
 }
 
 function voiceStarted() {
   print('Voice started');
+  centerTitle.hide = true;
 }
 
 function voiceEnded() {
-  print('Voice ended.');
+  // Schedule for next speaking. 
+  setTimeout(initVoice, timeToWaitBeforeSpeaking);
+
+  // Show center title since the voice is done.
+  centerTitle.listening = true; // So, it starts showing listening text. 
+  centerTitle.hide = false;
+
+  // Turn on speech recognition.
+  speech.start();
 }
 
 function voiceLoaded() {
@@ -98,13 +117,7 @@ function draw() {
     }
   }
 
-  if (centerTitle.animating) {
-    // Init speech when the animation completes. 
-    // centerTitle.animate(initSpeech);
-    centerTitle.animate(initVoice);
-  } else {
-    centerTitle.oscillate();
-  }
+  centerTitle.run(initVoice);
 }
 
 // Callback functions for trending gifs. 
@@ -118,7 +131,8 @@ function trending(gData) {
 
 // Results from the Speech recognition algorithm. 
 function speechResult(result) {
-  centerTitle.setVoiceText(result);
+  // Don't set the text right. 
+  //centerTitle.setVoiceText(result);
   giphy.search(result, searchGifLimit, searchResults);
 }
 

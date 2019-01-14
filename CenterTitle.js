@@ -2,12 +2,16 @@ class CenterTitle {
     constructor() {
         // Animating props. 
         this.animating = true; 
+        this.listening = false;
+        this.hide = false;
+
         this.curPos = createVector(0, 0);
         this.finalPos = createVector(2*gifWidth, 3*gifHeight);
 
         this.curSize = createVector(screen.width, screen.height);
         this.finalSize = createVector(4*gifWidth-30, 2*gifHeight-30);
 
+        this.aniCounter = 0.0;
         this.curOpacity = 0.95;
         this.finalOpacity = 0; 
 
@@ -35,8 +39,28 @@ class CenterTitle {
 
     }
 
+    run(initVoiceCbk) {
+        if (this.animating) {
+            this.animate(initVoiceCbk);
+        }
+
+        if (this.listening) {
+            this.listen();
+        }
+
+        // Hide the center tile.
+        if (this.hide) {
+            this.el.style('opacity', 1);
+            this.el.style('background-image', 'linear-gradient(to bottom right, red, green)');
+            this.el.html('');
+
+            // Reset aniCounter to start animation from the beginning. 
+            this.aniCounter = 0;
+        }
+    }
+
     // Animation logic here. 
-    animate(initSpeechCbk) {
+    animate(initVoiceCbk) {
         // Let's lerp opacity.
         this.curOpacity = lerp(this.curOpacity, this.finalOpacity, 0.01);
         this.el.style("opacity", this.curOpacity);
@@ -54,22 +78,34 @@ class CenterTitle {
         if (d < 1) {
             print (this.curOpacity);
             this.animating = false;
-            this.el.html("I'm Listening"); 
-            initSpeechCbk(); // Initialize speech. 
+
+            // Hide the Center Tile and initialize voice. 
+            this.el.style('opacity', 0);
+            this.el.html("I'm Listening");
+            initVoiceCbk();
         }
     }
 
-    oscillate() {
-        // Do nothing right now. 
-        var offset = 20*PI + this.curOpacity; 
-        var o = map(cos(frameCount/offset), -1, 1, 0.0, 0.90);
+    listen() {
+        this.el.html("I'm Listening");
+        this.el.style('background-image', 'linear-gradient(to bottom right, #5E0000, #800000)');
+        this.aniCounter += 0.1; 
+        // // Do nothing right now. 
+        var o = map(cos(this.aniCounter), -1, 1, 0.9, 0.5);
         this.el.style('opacity', o);
 
-        // Check here when to revert back to the old text. 
-        if (millis() - this.timer > 15000) { // 60 seconds
-            this.el.style('font-size', '80px');
-            this.el.html("I'm Listening");
-        }
+        // Draw a pattern here of lines. 
+        // for (var i = this.curPos.x; i < this.curPos.x + this.curSize.x; i+=5) {
+        //    fill(0)
+        //    ellipse(i, this.curPos.y, 10, 10);     
+        // }
+
+
+        // // Check here when to revert back to the old text. 
+        // if (millis() - this.timer > 15000) { // 60 seconds
+        //     this.el.style('font-size', '80px');
+        //     this.el.html("I'm Listening");
+        // }
     }
 
     setVoiceText(text) {

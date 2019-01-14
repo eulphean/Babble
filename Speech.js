@@ -3,20 +3,36 @@ class Speech {
     constructor(speechResult) {
         this.speechRec = new p5.SpeechRec('en-In', this.gotSpeech.bind(this));
         this.speechRec.onEnd = this.endAudio.bind(this);
+        this.speechRec.onError = this.errorAudio.bind(this);
         this.speechRec.onStart = this.startAudio.bind(this);
         this.speechRec.continuous = true; 
         this.speechRec.interimResults = false;
         this.callback = speechResult; 
+
+        // Should we stop the engine deliberately? 
+        this.stopDeliberately = false; 
+    }
+
+    start() {
         this.speechRec.start();
     }
 
     endAudio() {
-        print("Oops, audio ended abruptly. Restarting audio.");
-        this.speechRec.start();
+        if (this.stopDeliberately == true) {
+            print("Stopped audio deliberately.");
+            this.stopDeliberately = false;
+        } else {
+            print("Error: Restart audio."); 
+            this.speechRec.start();
+        }
+    }
+    
+    errorAudio() {
+        print("Ooops, some error.");
     }
 
     startAudio() {
-        print("Opening the audio channel for speech recognition.");
+        print("Begin speech recognition.");
     }
 
     gotSpeech() {
