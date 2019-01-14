@@ -29,7 +29,6 @@ class CenterTitle {
         this.el.style('display', 'flex');
         this.el.style("align-items", "center");
         this.el.style('background-image', 'linear-gradient(to bottom right, #5E0000, #800000)');
-        //this.el.style('background-color', '#800000');
         this.el.style("justify-content", "center");
         this.el.style("text-align", "center");
         this.el.style("padding", "15px");
@@ -75,14 +74,14 @@ class CenterTitle {
 
         // End animation logic. 
         var d = p5.Vector.dist(this.curSize, this.finalSize);
-        if (d < 1) {
+        if (d < 0.5) {
             print (this.curOpacity);
             this.animating = false;
 
             // Hide the Center Tile and initialize voice. 
             this.el.style('opacity', 0);
             this.el.html("I'm Listening");
-            initVoiceCbk();
+            initVoiceCbk(false);
         }
     }
 

@@ -9,7 +9,7 @@ var gifWidth, gifHeight;
 var gifElements = []; 
 var minGifsToUpdate = 15; 
 var maxGifsToUpdate = 25; // Maximum gifs a search query can update on the wall. 
-var timeToWaitBeforeSpeaking = 5000; // 5 seconds. 
+var timeToWaitBeforeSpeaking = 5000; // 10 seconds.  
 var bgColors = [];
 var searchIcons = ['magnify1.svg', 'magnify2.svg', 'magnify3.svg', 'magnify4.svg', 'magnify5.svg'];
 var button;
@@ -22,6 +22,22 @@ var voice;
 // Sounds. 
 var whistle;
 var notifications;
+var voiceTimer = null;
+var isSpeaking = false;
+var hasResponded = false;
+var State = {
+  Babble: 1,
+  Responding: 2
+};
+
+var speakingState = State.Babble;
+
+// Personality sentences. 
+var babble = ["Look at me, please?", "Babble into me.", "Babble.", "Babble it away.", "Let us Babble with each other.", "Babble gabble.", "Come gabble with me.", "Please, check out this wall. It's only for you, love."];
+var seduce = ["Please, talk to me?", "I, miss, you.", "I am here for you.", "Can I show you something? Ask me, please.", "What would you like to see?", "Can I make you happy? Just Babble the words.", "I am yours, and you are mine. Let us Babble.", "I am sad. Are you there?", "Can I get you something?"];
+var acknowledge = ["I heard you.", "Right on.", "Got that.", "Well said.", "Beautiful"];
+var looking = ["Let me see what I have.", "I might have something for you.", "Now, see this."];
+var notfound = ["Nada! Nothing found.", "I apologize. Nothing with that here.", "Sorry, not your day today."];
 
 // Property to save indexes for future. 
 var newIdxUrls = [];
@@ -68,43 +84,106 @@ function setup() {
   centerTitle = new CenterTitle(); 
 
   // Initialize voice engine. 
-  voice = new VoiceSpeech(voiceLoaded, voiceStarted, voiceEnded);
+  voice = new VoiceSpeech(voiceStarted, voiceEnded);
 
   // Initialize speech engine. 
   speech = new Speech(speechResult); 
 }
 
-function initVoice() {
-  notification.play();
-  // Turn off speech recognition deliberately if it's recognizing. 
-  if (speech != null) {
+// Babble speaks. 
+function speak(isResponding) {
+  // Turn off speech recognition deliberately before speaking. 
+  if (speech.isRunning) {
     speech.stopDeliberately = true;
-    speech.speechRec.rec.stop();
+    speech.stop();
   }
 
-  // Utter the words. 
-  voice.utter('Hey! I am Babble.');
+  // Speak something.
+  var text; 
+  if (isResponding) {
+    text = acknowledge[floor(random(acknowledge.length))];
+  } else {
+    // 40 percent chance it'll babble.
+    if (random(1) < 0.4) {
+      text = babble[floor(random(babble.length))];
+    } else {
+      // 60 percent chance it'll seduce.
+      text = seduce[floor(random(seduce.length))];
+    }
+  }
+
+  // A sound buzz.
+  notification.play();
+  voice.utter(text);
 }
 
 function voiceStarted() {
-  print('Voice started');
   centerTitle.hide = true;
+  isSpeaking = true;
 }
 
 function voiceEnded() {
-  // Schedule for next speaking. 
-  setTimeout(initVoice, timeToWaitBeforeSpeaking);
-
   // Show center title since the voice is done.
   centerTitle.listening = true; // So, it starts showing listening text. 
   centerTitle.hide = false;
 
-  // Turn on speech recognition.
-  speech.start();
+  // Only reset timer if I'm still Babbling
+  if (speakingState == State.Babble || speakingState == State.Responding) {
+    print('Resetting timer');
+    clearTimeout(voiceTimer);
+    voiceTimer = setTimeout(speak, timeToWaitBeforeSpeaking);
+  }
+
+  if (!speech.isRunning) {
+    // Turn on speech recognition.
+    print('Is Running: ' + speech.isRunning);
+    speech.start();
+  }
+
+  isSpeaking = false;
 }
 
-function voiceLoaded() {
-  print('Voice loaded.');
+// Results from the Speech recognition algorithm. 
+// Receiving interim results from the speech recognition 
+// engine now. As soon as a result comes, 
+// 1: turn off any Voice if it's going on. 
+// 2: clear timer so next automatic voice is not scheduled. 
+// 3: respond with a response immediately (before isFinal is true). Then respond when isFinal is true.
+// 4: when isFinal is true, then print the result and also search Giphy. 
+function speechResult(result, isFinal) {
+    speakingState = State.Responding;
+    print(result);
+
+    if (!isFinal) {
+      // Stop the voice if there is any. 
+      if (isSpeaking) {
+        print('Stop speaking');
+        voice.stop();
+      }
+
+      // Clear timer if we haven't cleared it already. 
+      if (voiceTimer) {
+        clearTimeout(voiceTimer);
+      }
+    } else {
+      // isFinal = true. Reset hasResponded flag.
+      print(result);
+      giphy.search(result, searchGifLimit, searchResults);
+      speak(true);
+    }
+  // // Cancel the timer because somebody just spoke.
+  // print('Clearing timer.');
+  // if (voiceTimer != null) {
+  //   clearTimeout(voiceTimer);
+  //   voiceTimer = null;
+  // }
+
+  // // Respond with the response and let the timer initiate again.
+  // speak(true);
+  
+  // // Don't set the text right. 
+  // //centerTitle.setVoiceText(result);
+  // giphy.search(result, searchGifLimit, searchResults);
 }
 
 function draw() {
@@ -117,7 +196,7 @@ function draw() {
     }
   }
 
-  centerTitle.run(initVoice);
+  centerTitle.run(speak);
 }
 
 // Callback functions for trending gifs. 
@@ -129,20 +208,12 @@ function trending(gData) {
   }
 }
 
-// Results from the Speech recognition algorithm. 
-function speechResult(result) {
-  // Don't set the text right. 
-  //centerTitle.setVoiceText(result);
-  giphy.search(result, searchGifLimit, searchResults);
-}
-
 function searchResults(gData) {
+  // Figure out what say here. 
   let numGifsReturned = gData.data.length; 
-  print("Total gifs returned: " + numGifsReturned);
   let maxGifs = numGifsReturned > maxGifsToUpdate ? maxGifsToUpdate : numGifsReturned; 
   let numGifsToUpdate = numGifsReturned <= minGifsToUpdate ? numGifsReturned : floor(random(minGifsToUpdate, maxGifs + 1)); 
 
-  print("Totals gifs updating: " + numGifsToUpdate);
   for (let i = 0; i < numGifsToUpdate; i++) {
     let idx; 
     do {
@@ -159,15 +230,11 @@ function searchResults(gData) {
     newIdxUrls[idx] = gifUrl; 
   }
 
-  print("Done with search results");
-
   // Wait for some time, then load new gifs.  
   setTimeout(setNewGifs, 5000);
 }
 
 function setNewGifs() {
-  print("Setting new gif");
-
   for (var idx in newIdxUrls) {
     var newUrl = newIdxUrls[idx]; 
     gifElements[idx].attribute('src', newUrl);

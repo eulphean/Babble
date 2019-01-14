@@ -6,24 +6,33 @@ class Speech {
         this.speechRec.onError = this.errorAudio.bind(this);
         this.speechRec.onStart = this.startAudio.bind(this);
         this.speechRec.continuous = true; 
-        this.speechRec.interimResults = false;
+        this.speechRec.interimResults = true;
         this.callback = speechResult; 
+
+        this.isRunning = false;
 
         // Should we stop the engine deliberately? 
         this.stopDeliberately = false; 
     }
 
     start() {
+        this.isRunning = true;
         this.speechRec.start();
+    }
+
+    stop() {
+        this.isRunning = false;
+        this.speechRec.rec.stop();
     }
 
     endAudio() {
         if (this.stopDeliberately == true) {
-            print("Stopped audio deliberately.");
+            print("Stopped speech recognition deliberately.");
             this.stopDeliberately = false;
         } else {
             print("Error: Restart audio."); 
             this.speechRec.start();
+            this.isRunning = true;
         }
     }
     
@@ -40,7 +49,7 @@ class Speech {
         var confidence = this.speechRec.resultConfidence; 
         var isFinal = this.speechRec.isFinal;
         print(result + ", " + confidence + ", " + isFinal);
-        speechResult(result);
+        speechResult(result, isFinal);
     }
 
 }
