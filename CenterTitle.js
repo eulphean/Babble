@@ -12,7 +12,7 @@ class CenterTitle {
         this.finalOpacity = 0; 
 
         // Dom element. 
-        this.el = createElement('div', "BABBLE-GABBLE"); 
+        this.el = createElement('div', "Babble Wall"); 
         this.el.position(this.curPos.x, this.curPos.y); 
         this.el.size(this.curSize.x, this.curSize.y);
 
@@ -74,8 +74,6 @@ class CenterTitle {
 
     setVoiceText(text) {
         // Revisit this based on how things look. 
- 
-
         var t = "Excellent. I heard you say '" + text + "'. Updating the wall.";
 
         if (t.length > 10) {

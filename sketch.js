@@ -1,3 +1,6 @@
+// Fullscreen on firefox
+//document.getElementsByTagName('html')[0].mozRequestFullScreen();void(0)
+
 // Display.
 var canvas; 
 var numCols = numRows = 8; // # gifs/row and # of rows.  
@@ -8,10 +11,13 @@ var minGifsToUpdate = 15;
 var maxGifsToUpdate = 25; // Maximum gifs a search query can update on the wall. 
 var bgColors = [];
 var searchIcons = ['magnify1.svg', 'magnify2.svg', 'magnify3.svg', 'magnify4.svg', 'magnify5.svg'];
+var button;
 
 // API Controllers. 
 var giphy; var searchGifLimit = maxGifsToUpdate;
 var speech;
+var voice; 
+var whistle;
 
 // Property to save indexes for future. 
 var newIdxUrls = [];
@@ -19,6 +25,11 @@ var randomPosition;
 
 // Center title 
 var centerTitle; 
+
+function preload() {
+  
+  whistle = loadSound('assets/psst.m4a');
+}
 
 function setup() {
   noStroke(); 
@@ -49,12 +60,33 @@ function setup() {
 
   // Initialize the center title 
   centerTitle = new CenterTitle(); 
+
+  // Initialize voice engine. 
+  voice = new VoiceSpeech(voiceLoaded, voiceStarted, voiceEnded)
 }
 
-  // Initialize speech recognizer
-  function initSpeech() {
-    speech = new Speech(speechResult); 
-  }
+// Initialize speech recognizer
+function initSpeech() {
+  speech = new Speech(speechResult); 
+}
+
+function initVoice() {
+  // whistle.play();
+  speech = new Speech(speechResult); 
+  voice.utter('Hey! I am Babble. Come talk to me.');
+}
+
+function voiceStarted() {
+  print('Voice started');
+}
+
+function voiceEnded() {
+  print('Voice ended.');
+}
+
+function voiceLoaded() {
+  print('Voice loaded.');
+}
 
 function draw() {
   // Draw background. 
@@ -68,7 +100,8 @@ function draw() {
 
   if (centerTitle.animating) {
     // Init speech when the animation completes. 
-    centerTitle.animate(initSpeech);
+    // centerTitle.animate(initSpeech);
+    centerTitle.animate(initVoice);
   } else {
     centerTitle.oscillate();
   }
