@@ -9,11 +9,12 @@ class Giphy {
         this.apiKey = "&api_key=6HvwgH0NUx4sWULd71ICf2VHbZU3D0R9";
         this.q = "&q=";
         this.limit = "&limit="; // Hardcoding limit. TODO: Add the logic for pagination. 
+        this.offset ="&offset=";
     }
 
-    search(text, limit, callback) {
+    search(text, limit, callback, offset=5) {
         // Create query string. 
-        let url = this.searchEndpoint + this.apiKey + this.q + text + this.limit + limit; 
+        let url = this.searchEndpoint + this.apiKey + this.q + text + this.limit + limit + this.offset + offset;
         loadJSON(url, callback);
         print("Initiate query for " + text);
     }
