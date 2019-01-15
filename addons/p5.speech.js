@@ -363,6 +363,12 @@
     }
   };
 
+  p5.SpeechRec.prototype.stop = function() {
+    if ('webkitSpeechRecognition' in window) {
+      this.rec.stop();
+    }
+  }
+
 }));
 
 /*

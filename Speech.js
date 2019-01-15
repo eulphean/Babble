@@ -12,7 +12,7 @@ class Speech {
         this.isRunning = false;
 
         // Should we stop the engine deliberately? 
-        this.stopDeliberately = false; 
+        this.stopD = false; 
     }
 
     start() {
@@ -26,9 +26,9 @@ class Speech {
     }
 
     endAudio() {
-        if (this.stopDeliberately == true) {
+        if (this.stopD == true) {
             print("Stopped speech recognition deliberately.");
-            this.stopDeliberately = false;
+            this.stopD = false;
         } else {
             print("Error: Restart audio."); 
             this.speechRec.start();

@@ -2,7 +2,7 @@
 // Based on where it is, it says different things. 
 
 class Agent {
-    constructor(voice, giphyResultsCallback) {
+    constructor(voice, speech, giphyResultsCallback) {
         // When agent has to speak something, it calls utter method on the voice engine. 
         this.voiceEngine = voice;
         this.curHealth = 100; 
@@ -44,45 +44,25 @@ class Agent {
 
         // Search results callback.
         this.giphyCallback = giphyResultsCallback;
+
+        // Begin speech recognition.
+        this.speechEngine = speech;
+        this.speechEngine.start();
+        this.isSpeaking = false;
+
+        print(this.speechEngine);
         
         // Search for happy text. 
         var text = this.happy[floor(random(0, this.happy.length))];
         giphy.search(text, numCols*numRows, this.giphyCallback, random(0, 50));
     }
 
-    run(giphy) {   
+    run() {   
         // Should I update bot's health?
         this.evaluateHealth();
 
         // Should the bot speak?
         this.evaluateVoice();
-
-        // if (!this.isDead) {
-        //     if (!this.hasQueried) {
-        //         var offset = random(0, 50);
-        //         if (this.curHealth == 100) {
-        //             var text = this.happy[floor(random(0, this.happy.length))];
-        //             giphy.search(text, numCols*numRows, resultsCallback, offset);
-        //         }
-
-        //         if (this.curHealth == 70) {
-        //             var text = this.worried[floor(random(0, this.worried.length))];  
-        //             giphy.search(this.worried, numCols*numRows, resultsCallback, offset);
-        //         }
-            
-        //         if (this.curHealth == 50 || this.curHealth == 30 || this.curHealth == 10) {
-        //             var text = this.unhappy[floor(random(0, this.unhappy.length))];
-        //             giphy.search(text, numCols*numRows, resultsCallback, offset);
-        //         }
-            
-        //         if (this.curHealth == 0) {
-        //             var text = this.unhappy[floor(random(0, this.unhappy.length))];
-        //             giphy.search(text, numCols*numRows, resultsCallback, offset);
-        //         }
-
-        //         this.hasQueried = true;
-        //     }
-        // }
     }
 
     evaluateHealth() {
@@ -173,11 +153,25 @@ class Agent {
                 sound.play();
             }
 
-            if (say != null) {
-                this.voiceEngine.utter(say);
-            }
+            this.speak(say);
 
             this.curVoiceTime = millis();
+        }
+    }
+
+    speak(say) {
+        if (say != null) {
+            // Stop speech recognition as soon as it starts speaking. 
+            if (this.speechEngine.isRunning) {
+                this.speechEngine.stopD = true;
+                this.speechEngine.stop();
+            }
+            
+            if (text != null) {
+                this.voiceEngine.utter(say);
+            }
+            
+            this.isSpeaking = true;
         }
     }
 

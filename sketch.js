@@ -23,7 +23,6 @@ var voice;
 // Sounds. 
 // var notifications;
 var voiceTimer = null;
-var isSpeaking = false;
 
 // Property to save indexes for future. 
 var newIdxUrls = [];
@@ -34,10 +33,6 @@ var centerTitle;
 
 // Health of the agent.
 var agent;
-
-// function preload() {
-//   notification.setVolume(0.5);
-// }
 
 function setup() {
   noStroke(); 
@@ -72,11 +67,11 @@ function setup() {
   // Initialize voice engine. 
   voice = new VoiceSpeech(voiceStarted, voiceEnded);
 
-  // Initialize speech engine. 
+  // Initialize speech engine and begin listening. 
   speech = new Speech(speechResult); 
 
   // Give agent a voice. 
-  agent = new Agent(voice, giphyResultCallback);
+  agent = new Agent(voice, speech, giphyResultCallback);
 }
 
 
@@ -93,7 +88,7 @@ function draw() {
   //centerTitle.run(speak);
  
   // Based on agent's health 
-  agent.run(giphy);
+  agent.run();
 }
 
 function giphyResultCallback(gData) {
@@ -107,30 +102,48 @@ function giphyResultCallback(gData) {
 
 function voiceStarted() {
   print('voice started');
-  // centerTitle.hide = true;
+
+  // // Stop speech recognition as soon as it starts speaking. 
+  // if (speech.isRunning) {
+  //   speech.stopDeliberately = true;
+  //   speech.stop();
+  // }
+
   // isSpeaking = true;
 }
 
 function voiceEnded() {
   print('voice ended');
   // // Show center title since the voice is done.
-  // centerTitle.listening = true; // So, it starts showing listening text. 
-  // centerTitle.hide = false;
+  //centerTitle.listening = true; // So, it starts showing listening text. 
+  //centerTitle.hide = false;
 
-  // // Only reset timer if I'm still Babbling
-  // if (speakingState == State.Babble || speakingState == State.Responding) {
-  //   print('Resetting timer');
-  //   clearTimeout(voiceTimer);
-  //   voiceTimer = setTimeout(speak, timeToWaitBeforeSpeaking);
+  if (!speech.isRunning) {
+  //   // Turn on speech recognition. 
+    speech.start();
+  }
+  agent.isSpeaking = false;
+}
+
+function speechResult(result, isFinal) {
+  print(result);
+
+  // if (!isFinal) {
+  //   // Stop the voice if there is any. 
+  //   if (isSpeaking) {
+  //     print('Stop speaking');
+  //     voice.stop();
+  //   }
+
+  //   // Clear timer if we haven't cleared it already. 
+  //   if (voiceTimer) {
+  //     clearTimeout(voiceTimer);
+  //   }
+  // } else {
+  //   print(result);
+  //   giphy.search(result, searchGifLimit, searchResults);
+  //   speak(true);
   // }
-
-  // if (!speech.isRunning) {
-  //   // Turn on speech recognition.
-  //   print('Is Running: ' + speech.isRunning);
-  //   speech.start();
-  // }
-
-  // isSpeaking = false;
 }
 
 function setNewGifs() {
@@ -253,27 +266,3 @@ function windowResized() {
 //   // notification.play();
 //   // voice.utter(text);
 // }
-
-
-function speechResult(result, isFinal) {
-    speakingState = State.Responding;
-    print(result);
-
-    if (!isFinal) {
-      // Stop the voice if there is any. 
-      if (isSpeaking) {
-        print('Stop speaking');
-        voice.stop();
-      }
-
-      // Clear timer if we haven't cleared it already. 
-      if (voiceTimer) {
-        clearTimeout(voiceTimer);
-      }
-    } else {
-      // isFinal = true. Reset hasResponded flag.
-      print(result);
-      giphy.search(result, searchGifLimit, searchResults);
-      speak(true);
-    }
-}
