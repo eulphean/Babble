@@ -3,7 +3,8 @@
 
 // Display.
 var canvas; 
-var numCols = numRows = 8; // # gifs/row and # of rows.  
+var numCols = 6;
+var numRows = 8; // # gifs/row and # of rows.  
 var parentDiv; 
 var gifWidth, gifHeight;  
 var gifElements = []; 

@@ -112,11 +112,11 @@ class Agent {
                 // Call sounds/happy sounds, happy samples.
                 if (random(1) < 0.3) {
                     sound = this.callSounds[floor(random(this.callSounds.length))];
-                    sound.setVolume(0.5);
+                    sound.setVolume(0.7);
                     say = null;
                 } else {
                     sound = this.happySounds[floor(random(this.happySounds.length))];
-                    sound.setVolume(0.5);
+                    sound.setVolume(0.7);
                     say = this.happySamples[floor(random(this.happySamples.length))];
                 }
             } else if (this.curHealth < 70 && this.curHealth > 60) {
@@ -127,7 +127,7 @@ class Agent {
                 // Call sounds or sad samples. 
                 if (random(1) < 0.3) {
                     sound = this.callSounds[floor(random(this.callSounds.length))];
-                    sound.setVolume(0.5);
+                    sound.setVolume(0.7);
                     say = null;
                 } else {
                     say = this.sadSamples[floor(random(this.sadSamples.length))];
@@ -140,11 +140,11 @@ class Agent {
                 // Low probability for a call sound
                 if (random(1) < 0.1) {
                     sound = this.callSounds[floor(random(this.callSounds.length))];
-                    sound.setVolume(0.3);
+                    sound.setVolume(0.7);
                     say = null;
                 }  else {
-                    sound = this.sadSounds[floor(random(this.sadSounds.length))];
-                    sound.setVolume(0.8);
+                    // sound = this.sadSounds[floor(random(this.sadSounds.length))];
+                    // sound.setVolume(1.0);
                     say = this.sadSamples[floor(random(this.sadSamples.length))];
                 }
             } else {
@@ -160,11 +160,11 @@ class Agent {
                 // Crying sounds and hate samples. 
                 if (random(1) < 0.2) {
                     sound = this.callSounds[floor(random(this.callSounds.length))];
-                    sound.setVolume(0.5);
+                    sound.setVolume(0.7);
                     say = null;
                 } else {
-                    sound = this.sadSounds[floor(random(this.sadSounds.length))];
-                    sound.setVolume(0.8); 
+                    // sound = this.sadSounds[floor(random(this.sadSounds.length))];
+                    // sound.setVolume(1.0); 
                     say = this.hateSamples[floor(random(this.hateSamples.length))];
                 }
             }
