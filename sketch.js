@@ -19,6 +19,7 @@ var button;
 var giphy; var searchGifLimit = maxGifsToUpdate;
 var speech;
 var voice; 
+var textAnalytics;
 
 // Sounds. 
 // var notifications;
@@ -72,6 +73,9 @@ function setup() {
 
   // Give agent a voice. 
   agent = new Agent(voice, speech, giphyResultCallback);
+
+  // Initialize text analytics. 
+  textAnalytics = new TextAnalytics(this.sentimentResults, this.keyPhrasesResults); // Pass the callbacks for sentiment and keyPhrases. 
 }
 
 
@@ -97,8 +101,11 @@ function giphyResultCallback(gData) {
     newIdxUrls[i] = gData.data[i].images.fixed_width_downsampled.url;
   }
 
+  // NOTE: Keep this here, don't remove it. It needs to be here. 
   setTimeout(setNewGifs, 1000);
 }
+
+// VOICE Functions -----------------------> 
 
 function voiceStarted() {
   print('voice started');
@@ -112,29 +119,64 @@ function voiceEnded() {
   //centerTitle.hide = false;
 
   // Turn on speech recognition.
-  if (!speech.isRunning) {
-    speech.start();
+  try {
+    if (!speech.isRunning) {
+      speech.start();
+    }
+  } catch(e) {
+    console.warn("Tried to start speech recognition when it was already started. Ignore it for now.")
   }
+
   agent.isSpeaking = false;
 }
 
+// SPEECH Functions ---------------------->
+
+// Handle Speech Inputs. 
 function speechResult(result, isFinal) {
   if (!isFinal) {
-    // Stop the voice if there is any. 
+    // Stop the voice. 
     if (agent.isSpeaking) {
       print('Stop speaking');
       agent.voiceEngine.stop();
     }
 
-    // Clear timer if we haven't cleared it already. 
-    if (voiceTimer) {
-      clearTimeout(voiceTimer);
-    }
+    // VISUAL ACTIVITY. Show this or something. 
+    // In the center as activity (actual text maybe) 
+    // In center title. Text changing. 
   } else {
+    // SOME VOICE? And visual happiness? 
+
+    // Final search result. 
     print(result);
-    giphy.search(result, searchGifLimit, searchResults);
-    speak(true);
+
+    // Send it to text analytics.
+
+    //textAnalytics.keyPhrases(result, this.keyPhrasesResults.bind(this)));
+    //textAnalytics.sentiment(result, this.sentimentResults.bind(this));
+
+    var sentiPromise = new Promise(function(resolve, reject) {
+      textAnalytics.sentiment(result, resolve);
+    });
+
+    var phrasePromise = new Promise(function(resolve, reject) {
+      textAnalytics.keyPhrases(result, resolve);
+    });
+
+    Promise.all([sentiPromise, phrasePromise]).then(function(values){
+      print(values);
+      textAnalyticsResults(values[0], values[1].phrases, values[1].originalText);
+    });
+
+    // Let's do searching part later. 
+    // giphy.search(result, searchGifLimit, giphyResultCallback);
   }
+}
+
+function textAnalyticsResults(sentiment, keyPhrases, originalText) {
+  print('Sentiment: ' + sentiment);
+  print('Key Phrases: ' + keyPhrases);
+  print('Original Text: ' + originalText);
 }
 
 function setNewGifs() {

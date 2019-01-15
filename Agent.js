@@ -69,7 +69,7 @@ class Agent {
         if (millis() - this.curHealthTime > this.maxHealthTime) {
             if (this.curHealth >= 0) {
                 this.curHealth -= this.subtractHealth;
-                print('Cur Health' + this.curHealth);
+                //print('Cur Health' + this.curHealth);
                 this.curHealthTime = millis();
                 this.isDead = false;
                 this.hasQueried = false;

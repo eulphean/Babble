@@ -1,14 +1,16 @@
+// Sentiment analysis using Microsoft's text analytics API.
+// Sentiment and analysis. 
+
 class TextAnalytics {
-  constructor () {
-    this.request = new XMLHttpRequest();
-    this.request.onload = this.onLoad.bind(this);
-    this.request.onerror = this.onError.bind(this);
+  constructor (sentimentCbk, keyPhrasesCbk) {
     this.api = 'https://eastasia.api.cognitive.microsoft.com/text/analytics/v2.0/';
     this.apiKey = '0455d2d0f6f7484d9c8068df41b15649';
     this.requestBody = {};
+    this.sentiCallback = sentimentCbk;
+    this.phrasesCallback = keyPhrasesCbk; 
   }
 
-  sentiment(inputText) {
+  sentiment(inputText, resolve) {
     // Create request body. 
     this.requestBody = {
         "documents": [
@@ -20,10 +22,19 @@ class TextAnalytics {
         ]
       };
 
-    this.createRequest('sentiment');
+    // Create and send request.
+    var request = new XMLHttpRequest(); 
+    request.onerror = this.onError.bind(this);
+    request.onload = this.onLoadSentiment.bind(this, request, resolve);
+    var uri = this.api + 'sentiment'; 
+    request.open('POST', uri, true);
+    request.setRequestHeader("Content-Type", "application/json");
+    request.setRequestHeader("Ocp-Apim-Subscription-Key", this.apiKey); // Set API key.
+    request.setRequestHeader("Accept","application/json");
+    request.send(JSON.stringify(this.requestBody));
   }
 
-  keyPhrases(inputText) {
+  keyPhrases(inputText, resolve) {
     // Create request body. 
     this.requestBody = {
       "documents": [
@@ -35,43 +46,41 @@ class TextAnalytics {
       ]
     };
 
-    // Create request. 
-    this.createRequest('keyPhrases');
+    // Create and send request. 
+    var request = new XMLHttpRequest(); 
+    request.onerror = this.onError.bind(this);
+    request.onload = this.onLoadKeyPhrases.bind(this, request, resolve);
+    var uri = this.api + 'keyPhrases'; 
+    request.open('POST', uri, true);
+    request.setRequestHeader("Content-Type", "application/json");
+    request.setRequestHeader("Ocp-Apim-Subscription-Key", this.apiKey); // Set API key.
+    request.setRequestHeader("Accept","application/json");
+    request.send(JSON.stringify(this.requestBody));
   }
 
-  createRequest(endpoint) {
-    var uri = this.api + endpoint; 
-    this.request.open('POST', uri, true);
-    this.request.setRequestHeader("Content-Type", "application/json");
-    this.request.setRequestHeader("Ocp-Apim-Subscription-Key", this.apiKey); // Set API key.
-    this.request.setRequestHeader("Accept","application/json");
-
-    this.request.send(JSON.stringify(this.requestBody));
+  onLoadSentiment(request, resolve) {
+    JSON.parse(request.responseText).documents.forEach(result => {
+     // resolve(this.sentiCallback(result.score));
+     resolve(result.score);
+    });
   }
 
-  onLoad() {
-    JSON.parse(this.request.responseText).documents.forEach(result => {
-      print(result);
+  onLoadKeyPhrases(request, resolve) {
+    var phrases = [];
+    JSON.parse(request.responseText).documents.forEach(result => {
+      result.keyPhrases.forEach(phrase => {
+         phrases.push(phrase);
+      });
+
+      var originalText = this.requestBody.documents[0].text;
+      var obj = {originalText, phrases};
+
+      print(obj);
+      resolve(obj);
     });
   }
   
   onError() {
-    alert(this.equest.responseText);
+    alert(this.request.responseText);
   }
 }
-  
-
-// this.request.onload = () => {
-//   // const resultList = document.getElementById('resultList');
-//   // // Clear resultList field.
-//   // resultList.innerHTML = '';
-//   // // Set response data.
-
-// };
-
-// request.onerror = () => {
-  
-// };
-  
-
-  
