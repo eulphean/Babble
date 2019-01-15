@@ -119,24 +119,22 @@ function voiceEnded() {
 }
 
 function speechResult(result, isFinal) {
-  print(result);
+  if (!isFinal) {
+    // Stop the voice if there is any. 
+    if (agent.isSpeaking) {
+      print('Stop speaking');
+      agent.voiceEngine.stop();
+    }
 
-  // if (!isFinal) {
-  //   // Stop the voice if there is any. 
-  //   if (isSpeaking) {
-  //     print('Stop speaking');
-  //     voice.stop();
-  //   }
-
-  //   // Clear timer if we haven't cleared it already. 
-  //   if (voiceTimer) {
-  //     clearTimeout(voiceTimer);
-  //   }
-  // } else {
-  //   print(result);
-  //   giphy.search(result, searchGifLimit, searchResults);
-  //   speak(true);
-  // }
+    // Clear timer if we haven't cleared it already. 
+    if (voiceTimer) {
+      clearTimeout(voiceTimer);
+    }
+  } else {
+    print(result);
+    giphy.search(result, searchGifLimit, searchResults);
+    speak(true);
+  }
 }
 
 function setNewGifs() {

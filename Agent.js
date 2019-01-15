@@ -154,7 +154,6 @@ class Agent {
             }
 
             this.speak(say);
-
             this.curVoiceTime = millis();
         }
     }
