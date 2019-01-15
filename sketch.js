@@ -102,14 +102,7 @@ function giphyResultCallback(gData) {
 
 function voiceStarted() {
   print('voice started');
-
-  // // Stop speech recognition as soon as it starts speaking. 
-  // if (speech.isRunning) {
-  //   speech.stopDeliberately = true;
-  //   speech.stop();
-  // }
-
-  // isSpeaking = true;
+  agent.isSpeaking = true;
 }
 
 function voiceEnded() {
@@ -118,8 +111,8 @@ function voiceEnded() {
   //centerTitle.listening = true; // So, it starts showing listening text. 
   //centerTitle.hide = false;
 
+  // Turn on speech recognition.
   if (!speech.isRunning) {
-  //   // Turn on speech recognition. 
     speech.start();
   }
   agent.isSpeaking = false;

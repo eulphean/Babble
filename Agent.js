@@ -167,11 +167,10 @@ class Agent {
                 this.speechEngine.stop();
             }
             
+            // Utter the words. 
             if (text != null) {
                 this.voiceEngine.utter(say);
             }
-            
-            this.isSpeaking = true;
         }
     }
 
