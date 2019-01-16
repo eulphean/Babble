@@ -68,12 +68,12 @@ function setup() {
   // Initialize speech engine and begin listening. 
   speech = new Speech(speechResult); 
 
-  // Give agent a voice. 
-  agent = new Agent(voice, speech, giphyResultCallback);
-    
   // Initialize the center title. 
   centerTitle = new CenterTitle(agent);
 
+  // Give agent a voice. ƒ
+  agent = new Agent(voice, speech, giphyResultCallback);
+    
   // Initialize text analytics. 
   textAnalytics = new TextAnalytics(this.sentimentResults, this.keyPhrasesResults); // Pass the callbacks for sentiment and keyPhrases. 
 }
@@ -138,50 +138,29 @@ function speechResult(result, isFinal) {
     if (!isFinal) {
       // Stop the voice. 
       if (agent.isSpeaking) {
-        // print('Stop speaking');
         agent.voiceEngine.stop();
       }
 
-      // I have started saying something. 
-      agent.canSpeak = false;
-
-      if (result.length < 100) {
-        // Don't schedule something, just keep updating the title. 
-        // Keep changing the title. 
-        centerTitle.setTitle(result);
-      }
+      // Keep resetting the agent's time. 
+      agent.curVoiceTime = millis();
+      centerTitle.setFullScreen();
+      centerTitle.setTitle(result);
     } else {
-      // This is final result. If the final result is legit, then send it for 
-      // Text Analytics. 
-      if (result.length < 100) {
-        // Final search result. 
-        //print(result);
-        // Text analyis on the result.
+      // Only send the text to Text Analytics if the final text length is less than 100. 
+      if (result.length < 60) {
+        console.log('Sending this to Text Analytics.');
         var sentiPromise = new Promise(function(resolve, reject) {
           textAnalytics.sentiment(result, resolve);
         });
-
         var phrasePromise = new Promise(function(resolve, reject) {
           textAnalytics.keyPhrases(result, resolve);
         });
-
         Promise.all([sentiPromise, phrasePromise]).then(function(values){
           textAnalyticsResults(values[0], values[1].phrases, values[1].originalText);
         });
-
-        centerTitle.setTitle("...Thinking...");
-      } else {
-        // I just heard junk. Don't analyse, just make the agent talk. 
-        agent.canSpeak = true;
-        agent.noCallSounds = true;
-        centerTitle.setTitle("I'm Listening");
-        agent.curVoiceTime = agent.maxVoiceTime + 1;
       }
 
-      // print('Length: ' + result.length);
-
-      // Let's do searching part later. 
-      // giphy.search(result, searchGifLimit, giphyResultCallback);
+      centerTitle.setTitle(result);
     }
   }
 }
@@ -201,8 +180,7 @@ function textAnalyticsResults(sentiment, keyPhrases, originalText) {
 
   // Reset agent's evaluate health timer and then let the bot respond itself. 
   agent.curVoiceTime = agent.maxVoiceTime + 1; // Force an evaluation
-  agent.canSpeak = true; 
-  agent.noCallSounds = true; 
+  centerTitle.setMiddleScreen();
   centerTitle.setTitle("I'm Listening");
   
   // Do something with the key phrases now. 

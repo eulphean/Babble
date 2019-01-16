@@ -1,21 +1,23 @@
 class CenterTitle {
     constructor(agent) {
         this.agent = agent;
-
+        
+        // Initial position. 
         this.curPos = createVector(0, 0);
-        this.finalPos = createVector(gifWidth, 3*gifHeight);
-
         this.curSize = createVector(screen.width, screen.height);
+        
+        // Final position.
+        this.finalPos = createVector(gifWidth, 3*gifHeight);
         this.finalSize = createVector(4*gifWidth, 2*gifHeight);
 
+        // Animation counter.
         this.aniCounter = 0.0;
         this.curOpacity = 0.95;
         this.finalOpacity = 0; 
 
         // Dom element. 
         this.el = createElement('div', "Babble Wall"); 
-        this.el.position(this.finalPos.x, this.finalPos.y); 
-        this.el.size(this.finalSize.x - 30, this.finalSize.y - 30);
+        this.setMiddleScreen();
 
         this.img = createImg('assets/ring.svg');
         this.img.style('opacity', 0);
@@ -63,5 +65,15 @@ class CenterTitle {
 
     setTitle(text) {
         this.el.html(text);
+    }
+
+    setFullScreen() {
+        this.el.position(this.curPos.x, this.curPos.y);
+        this.el.size(screen.width, screen.height);
+    }
+
+    setMiddleScreen() {
+        this.el.position(this.finalPos.x, this.finalPos.y);
+        this.el.size(this.finalSize.x - 30, this.finalSize.y - 30);
     }
 };
