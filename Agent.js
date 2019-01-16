@@ -12,7 +12,7 @@ class Agent {
 
         // How often does the bot's health decrease. 
         this.curHealthTime = millis();
-        this.maxHealthTime = 1000; // Wait this time before evaluating health.
+        this.maxHealthTime = 5000; // Wait this time before evaluating health.
         this.subtractHealth = 0.5;
 
         // Corpus of health texts that the agent uses at specific intervals of its health.
@@ -24,7 +24,7 @@ class Agent {
         // Voice (how often does the bot speak or create sounds to express itself?)
         this.canSpeak = true;
         this.curVoiceTime = millis();
-        this.maxVoiceTime = 10000;
+        this.maxVoiceTime = 20000;
 
         // Voice sample
         this.sadSamples = ['Is anybody there?', 'Can you compliment me?', 'Please, look at me.', 'Please, can you praise me?', 'Hello?', 'Please, say something nice to me.', 'Are you there?', "I don't want to cry.", "Hello, is somebody there?", "Where is everybody?", "Where are you?"];
