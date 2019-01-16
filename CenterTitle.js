@@ -24,7 +24,7 @@ class CenterTitle {
 
         // Styles. 
         this.el.style("opacity", this.curOpacity);
-        this.el.style("font-family", 'Anton');
+        this.el.style("font-family", 'Roboto');
         this.el.style("letter-spacing", '10px');
         this.el.style('font-size', '70px');
         this.el.style("color", "#ffbf00");
