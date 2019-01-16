@@ -82,7 +82,7 @@ class Agent {
         }
     }
 
-    evaluateVoice(callSounds) {
+    evaluateVoice() {
         if (millis() - this.curVoiceTime > this.maxVoiceTime) {
             var say, sound;
             var offset = random(0, 50);
@@ -177,6 +177,7 @@ class Agent {
             if (text != null) {
                 this.isSpeaking = true;
                 this.voiceEngine.utter(say);
+                this.noCallSounds = true;
             }
         }
     }

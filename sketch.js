@@ -145,21 +145,15 @@ function speechResult(result, isFinal) {
       // I have started saying something. 
       agent.canSpeak = false;
 
-      if (result.length < 50) {
-          // Don't schedule something. 
+      if (result.length < 100) {
+        // Don't schedule something, just keep updating the title. 
+        // Keep changing the title. 
          centerTitle.setTitle(result);
       }
-
-      //print('Length: ' + result.length);
-
-      // VISUAL ACTIVITY. Show this or something. 
-      // In the center as activity (actual text maybe) 
-      // In center title. Text changing. 
     } else {
-      // SOME VOICE? And visual happiness? 
-
-      // Don't send it for Text Analysis.
-      if (result.length < 50) {
+      // This is final result. If the final result is legit, then send it for 
+      // Text Analytics. 
+      if (result.length < 100) {
         // Final search result. 
         //print(result);
         // Text analyis on the result.
@@ -179,6 +173,7 @@ function speechResult(result, isFinal) {
       } else {
         // I just heard junk. Don't analyse, just make the agent talk. 
         agent.canSpeak = true;
+        agent.noCallSounds = true;
         centerTitle.setTitle("I'm Listening");
         agent.curVoiceTime = agent.maxVoiceTime + 1;
       }
@@ -204,12 +199,11 @@ function textAnalyticsResults(sentiment, keyPhrases, originalText) {
     agent.curHealth = 0; 
   }
 
-  // Original text.
-  // centerTitle.setTitle("'" + originalText + "'");
-
-  // Reset agent' evaluate health timer and then let the bot respond itself. 
-  agent.curVoiceTime = agent.maxVoiceTime - 1000; // Force an evaluation
+  // Reset agent's evaluate health timer and then let the bot respond itself. 
+  agent.curVoiceTime = agent.maxVoiceTime + 1; // Force an evaluation
   agent.canSpeak = true; 
+  agent.noCallSounds = true; 
+  centerTitle.setTitle("I'm Listening");
   
   // Do something with the key phrases now. 
   // print('Sentiment: ' + sentiment);
