@@ -3,7 +3,7 @@ class CenterTitle {
         this.agent = agent;
 
         this.curPos = createVector(0, 0);
-        this.finalPos = createVector(2*gifWidth, 2*gifHeight);
+        this.finalPos = createVector(1*gifWidth, 3*gifHeight);
 
         this.curSize = createVector(screen.width, screen.height);
         this.finalSize = createVector(4*gifWidth, 2*gifHeight);
