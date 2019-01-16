@@ -22,12 +22,13 @@ class Agent {
         this.hate = ['hate', 'angry', 'anger', 'red', 'awful', 'annoyed', 'irritated'];
 
         // Voice (how often does the bot speak or create sounds to express itself?)
+        this.canSpeak = true;
         this.curVoiceTime = millis();
         this.maxVoiceTime = 10000;
 
         // Voice sample
-        this.sadSamples = ['Is anybody there?', 'Can you compliment me?', 'Please, look at me.', 'Please, talk to me.', 'Please, say something.', 'Hello?', 'Please, say something nice to me.', 'Are you there?', "I don't want to cry.", "Hello, is somebody there?", "Please talk to me."];
-        this.hateSamples = ["I hate you.", "You could not even say something nice to me?", "There is still time. Say something nice."];
+        this.sadSamples = ['Is anybody there?', 'Can you compliment me?', 'Please, look at me.', 'Please, can you praise me?', 'Hello?', 'Please, say something nice to me.', 'Are you there?', "I don't want to cry.", "Hello, is somebody there?", "Where is everybody?", "Where are you?"];
+        this.hateSamples = ["I hate you.", "You, suck.", "Go away.", "I can say one thing to you. I, H, A, TEA, YOU.. I hate you.", "You cannot even say something nice to me?", "There is still time. Say something nice.", "You are so bad.", "This is not a good day for me."];
         this.happySamples = ["I feel great today.", "Thank you for being so nice to me.", "I love you.", "You make me happy."];
 
         // Load sound samples.
@@ -55,6 +56,8 @@ class Agent {
         // Search for happy text. 
         var text = this.happy[floor(random(0, this.happy.length))];
         giphy.search(text, numCols*numRows, this.giphyCallback, random(0, 50));
+
+        this.noCallSounds = false;
     }
 
     run() {   
@@ -79,7 +82,7 @@ class Agent {
         }
     }
 
-    evaluateVoice() {
+    evaluateVoice(callSounds) {
         if (millis() - this.curVoiceTime > this.maxVoiceTime) {
             var say, sound;
             var offset = random(0, 50);
@@ -112,7 +115,7 @@ class Agent {
                 } else {
                     say = this.sadSamples[floor(random(this.sadSamples.length))];
                 }
-            } else if (this.curHealth > 5 && this.curHealth < 60){
+            } else if (this.curHealth > 30 && this.curHealth < 60){
                 // Unhappy samples. 
                 var text = this.unhappy[floor(random(0, this.unhappy.length))];
                 giphy.search(text, numCols*numRows, this.giphyCallback, offset);
@@ -151,9 +154,13 @@ class Agent {
             
             if (sound != null) {
                 sound.play();
+                sound.onEnded
             }
 
-            this.speak(say);
+            if (this.canSpeak) {
+                this.speak(say);
+            }
+
             this.curVoiceTime = millis();
         }
     }
@@ -168,6 +175,7 @@ class Agent {
             
             // Utter the words. 
             if (text != null) {
+                this.isSpeaking = true;
                 this.voiceEngine.utter(say);
             }
         }

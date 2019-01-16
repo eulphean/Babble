@@ -21,13 +21,13 @@ class Speech {
     }
 
     stop() {
-        this.isRunning = false;
         this.speechRec.rec.stop();
     }
 
     endAudio() {
         if (this.stopD == true) {
             print("Stopped speech recognition deliberately.");
+            this.isRunning = false;
             this.stopD = false;
         } else {
             print("Error: Restart audio."); 
@@ -37,7 +37,7 @@ class Speech {
     }
     
     errorAudio() {
-        print("Ooops, some error.");
+       // print("Ooops, some error.");
     }
 
     startAudio() {

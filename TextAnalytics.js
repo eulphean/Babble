@@ -74,8 +74,6 @@ class TextAnalytics {
 
       var originalText = this.requestBody.documents[0].text;
       var obj = {originalText, phrases};
-
-      print(obj);
       resolve(obj);
     });
   }
