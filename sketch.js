@@ -147,7 +147,7 @@ function speechResult(result, isFinal) {
       centerTitle.setTitle(result);
     } else {
       // Only send the text to Text Analytics if the final text length is less than 100. 
-      if (result.length < 60) {
+      if (result.length < 50) {
         console.log('Sending this to Text Analytics.');
         var sentiPromise = new Promise(function(resolve, reject) {
           textAnalytics.sentiment(result, resolve);
@@ -160,6 +160,7 @@ function speechResult(result, isFinal) {
         });
       }
 
+      // Don't reevaluate if it's capturing only junk.
       centerTitle.setTitle(result);
     }
   }
@@ -180,6 +181,7 @@ function textAnalyticsResults(sentiment, keyPhrases, originalText) {
 
   // Reset agent's evaluate health timer and then let the bot respond itself. 
   agent.curVoiceTime = agent.maxVoiceTime + 1; // Force an evaluation
+  agent.isResponding = true;
   centerTitle.setMiddleScreen();
   centerTitle.setTitle("I'm Listening");
   
