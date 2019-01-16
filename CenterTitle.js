@@ -6,7 +6,7 @@ class CenterTitle {
         this.finalPos = createVector(2*gifWidth, 2*gifHeight);
 
         this.curSize = createVector(screen.width, screen.height);
-        this.finalSize = createVector(2*gifWidth, 4*gifHeight);
+        this.finalSize = createVector(4*gifWidth, 2*gifHeight);
 
         this.aniCounter = 0.0;
         this.curOpacity = 0.95;
