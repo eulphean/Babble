@@ -148,7 +148,7 @@ function speechResult(result, isFinal) {
       if (result.length < 100) {
         // Don't schedule something, just keep updating the title. 
         // Keep changing the title. 
-         centerTitle.setTitle(result);
+        centerTitle.setTitle(result);
       }
     } else {
       // This is final result. If the final result is legit, then send it for 
