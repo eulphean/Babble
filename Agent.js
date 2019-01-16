@@ -13,7 +13,7 @@ class Agent {
         // How often does the bot's health decrease. 
         this.curHealthTime = millis();
         this.maxHealthTime = 10000; // Wait this time before evaluating health.
-        this.subtractHealth = 0.5;
+        this.subtractHealth = 0.3;
 
         // Corpus of health texts that the agent uses at specific intervals of its health.
         this.happy = ['happy', 'joy', 'wonderful', 'lovely', 'elated', 'amazing', 'awesome', 'rainbows', 'unicorns', 'happiness', 'neon', 'bright lights', 'lights', 'beauty', 'positivity'];
@@ -23,7 +23,7 @@ class Agent {
 
         // Voice (how often does the bot speak or create sounds to express itself?)
         this.curVoiceTime = millis();
-        this.maxVoiceTime = 10000;
+        this.maxVoiceTime = 20000;
 
         // Voice sample
         this.sadSamples = ['Is anybody there?', 'Can you compliment me?', 'Please, look at me.', 'Please, can you praise me?', 'Hello?', 'Please, say something nice to me.', 'Are you there?', "I don't want to cry.", "Hello, is somebody there?", "Where is everybody?", "Where are you?", "Happiness is the most tired word in any language.", "Am I that hard to keep happy?", "Come, talk to me.", "Just say, 'Happy', and I am yours.", "Okay. I am really pissed now.", "I am getting angry.", "You are so boring, and uninteresting.", "You make me sad. So sad.", "I am right here. Come say Hi.", "You can do better.", "Please, grow up.", "Bla, bla, bla, bla, bla. You never say nice things to me.", "Please, don't do this to me.", "You annoy me.", "Say something good. Say something.", "Just Babble into me.", "My head hurts. Can you cheer me up?", "Can you cheer me up?", "Why don't you say something nice?", "I hear everything, yet I don't hear what I want to.", "Babble into me.", "Please, just Babble.", "You need me in your life."];

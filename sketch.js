@@ -108,15 +108,9 @@ function giphyResultCallback(gData) {
 // VOICE Functions -----------------------> 
 
 function voiceStarted() {
-  print('voice started');
 }
 
 function voiceEnded() {
-  print('voice ended');
-  // // Show center title since the voice is done.
-  //centerTitle.listening = true; // So, it starts showing listening text. 
-  //centerTitle.hide = false;
-
   // Turn on speech recognition.
   try {
     if (!speech.isRunning) {
@@ -167,28 +161,34 @@ function speechResult(result, isFinal) {
 }
 
 function textAnalyticsResults(sentiment, keyPhrases, originalText) {
-  if (sentiment >= 0.9) {
-    agent.curHealth = 90;
-  } else if(sentiment >= 0.7) {
-    agent.curHealth = 80; 
-  } else if (sentiment >= 0.5 && sentiment < 0.7) {
-    agent.curHealth = 70; 
-  } else if (sentiment >= 30 && sentiment < 50) {
-    agent.curHealth = 50; 
+  if (agent.curHealth > 70 && keyPhrases.length > 0) {
+    agent.curVoiceTime = millis(); // Reset the time before the agent reevaluates its emotions.
+    // Take all the keywords, create a string, and look them up. 
+    var text = '';
+    keyPhrases.forEach(function(item) {
+      text += item + ' '; 
+    });
+    text = text.trim();
+    // Start a selective search for these gifs
+    giphy.search(text, this.maxGifsToUpdate, this.selectiveResults, 0);
   } else {
-    agent.curHealth = 0; 
-  }
+    if (sentiment >= 0.9) {
+      agent.curHealth = 90;
+    } else if(sentiment >= 0.7) {
+      agent.curHealth = 80; 
+    } else if (sentiment >= 0.5 && sentiment < 0.7) {
+      agent.curHealth = 70; 
+    } else if (sentiment >= 30 && sentiment < 50) {
+      agent.curHealth = 50; 
+    } else {
+      agent.curHealth = 0; 
+    }
 
-  // Reset agent's evaluate health timer and then let the bot respond itself. 
-  agent.curVoiceTime = agent.maxVoiceTime + 1; // Force an evaluation
-  agent.isResponding = true;
-  centerTitle.setMiddleScreen();
-  centerTitle.setTitle("I'm Listening");
-  
-  // Do something with the key phrases now. 
-  // print('Sentiment: ' + sentiment);
-  // print('Key Phrases: ' + keyPhrases);
-  // print('Original Text: ' + originalText);
+    agent.curVoiceTime = agent.maxVoiceTime + 1; // Force an evaluation
+    agent.isResponding = true;
+    centerTitle.setMiddleScreen();
+    centerTitle.setTitle("I'm Listening");
+  }
 }
 
 function setNewGifs() {
@@ -198,6 +198,35 @@ function setNewGifs() {
   } 
   // Clear the old object. 
   newIdxUrls = [];
+}
+
+function selectiveResults(gData) {
+  // Figure out what say here. 
+  let numGifsReturned = gData.data.length; 
+  let maxGifs = numGifsReturned > maxGifsToUpdate ? maxGifsToUpdate : numGifsReturned; 
+  let numGifsToUpdate = numGifsReturned <= minGifsToUpdate ? numGifsReturned : floor(random(minGifsToUpdate, maxGifs + 1)); 
+
+  for (let i = 0; i < numGifsToUpdate; i++) {
+    let idx; 
+    do {
+      idx = floor(random(gifElements.length));
+    } while (newIdxUrls.hasOwnProperty(idx));
+
+    // Clear the div at that index. 
+    let randIconIdx = floor(random(searchIcons.length));
+    let iconString = 'assets/' + searchIcons[randIconIdx];
+    gifElements[idx].attribute('src', iconString);
+
+    // Create an object {index: url} to update in setNewGifs method. 
+    var gifUrl = gData.data[i].images.fixed_width_downsampled.url;
+    newIdxUrls[idx] = gifUrl; 
+  }
+
+  centerTitle.setTitleText("I'm Listening");
+  centerTitle.setMiddleScreen();
+
+  // Wait for some time, then load new gifs.  
+  setTimeout(setNewGifs, 500);
 }
 
 function initBgColors() {
