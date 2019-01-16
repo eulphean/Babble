@@ -208,12 +208,13 @@ function textAnalyticsResults(sentiment, keyPhrases, originalText) {
   // centerTitle.setTitle("'" + originalText + "'");
 
   // Reset agent' evaluate health timer and then let the bot respond itself. 
-  agent.curVoiceTime = agent.maxVoiceTime - 2000; // Force an evaluation
-  agent.canSpeak = true;
-
-  print('Sentiment: ' + sentiment);
-  print('Key Phrases: ' + keyPhrases);
-  print('Original Text: ' + originalText);
+  agent.curVoiceTime = agent.maxVoiceTime - 1000; // Force an evaluation
+  agent.canSpeak = true; 
+  
+  // Do something with the key phrases now. 
+  // print('Sentiment: ' + sentiment);
+  // print('Key Phrases: ' + keyPhrases);
+  // print('Original Text: ' + originalText);
 }
 
 function setNewGifs() {
