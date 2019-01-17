@@ -71,7 +71,7 @@ class CenterTitle {
 
     setFullScreen() {
         this.el.position(this.curPos.x, this.curPos.y);
-        this.el.size(screen.width, screen.height);
+        this.el.size(this.curSize.x - 30, this.curSize.y  - 30);
     }
 
     setMiddleScreen() {
