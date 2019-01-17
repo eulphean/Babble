@@ -36,7 +36,7 @@ class CenterTitle {
         this.el.style("justify-content", "center");
         this.el.style("text-align", "center");
         this.el.style("padding", "15px");
-        this.el.style('display', 'block');
+        this.el.style('overflow', 'hidden');
 
         // Saved text // Push another.
         this.setTitle("I'm Listening");
