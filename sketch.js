@@ -161,7 +161,7 @@ function speechResult(result, isFinal) {
 }
 
 function textAnalyticsResults(sentiment, keyPhrases, originalText) {
-  if (agent.curHealth > 70 && keyPhrases.length > 0) {
+  if (sentiment > 0.6 && agent.curHealth > 70 && keyPhrases.length > 0) {
     print('Searching specific result. Found keyPhrases and a happy health.');
     agent.curVoiceTime = millis(); // Reset the time before the agent reevaluates its emotions.
     // Take all the keywords, create a string, and look them up. 
