@@ -9,7 +9,7 @@ var parentDiv;
 var gifWidth, gifHeight;  
 var gifElements = []; 
 var minGifsToUpdate = 15; 
-var maxGifsToUpdate = 25; // Maximum gifs a search query can update on the wall. 
+var maxGifsToUpdate = 40; // Maximum gifs a search query can update on the wall. 
 var timeToWaitBeforeSpeaking = 5000; // 10 seconds.  
 var bgColors = [];
 var searchIcons = ['magnify1.svg', 'magnify2.svg', 'magnify3.svg', 'magnify4.svg', 'magnify5.svg'];
@@ -154,7 +154,7 @@ function speechResult(result, isFinal) {
         });
       }
 
-      // Don't reevaluate if it's capturing only junk.
+      // Don't reevaluate if it's capturing only junk. Just show that. 
       centerTitle.setTitle(result);
     }
   }
@@ -162,6 +162,7 @@ function speechResult(result, isFinal) {
 
 function textAnalyticsResults(sentiment, keyPhrases, originalText) {
   if (agent.curHealth > 70 && keyPhrases.length > 0) {
+    print('Searching specific result. Found keyPhrases and a happy health.');
     agent.curVoiceTime = millis(); // Reset the time before the agent reevaluates its emotions.
     // Take all the keywords, create a string, and look them up. 
     var text = '';
@@ -222,11 +223,14 @@ function selectiveResults(gData) {
     newIdxUrls[idx] = gifUrl; 
   }
 
-  centerTitle.setTitleText("I'm Listening");
+  centerTitle.setTitle("I'm Listening");
   centerTitle.setMiddleScreen();
+  agent.isResponding = true;
+  agent.keyWordSearch = true;
+  agent.curVoiceTime = agent.maxVoiceTime + 1; // Force an evaluation
 
   // Wait for some time, then load new gifs.  
-  setTimeout(setNewGifs, 500);
+  setTimeout(setNewGifs, 1000);
 }
 
 function initBgColors() {

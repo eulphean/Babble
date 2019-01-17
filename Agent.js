@@ -16,7 +16,7 @@ class Agent {
         this.subtractHealth = 0.3;
 
         // Corpus of health texts that the agent uses at specific intervals of its health.
-        this.happy = ['happy', 'joy', 'wonderful', 'lovely', 'elated', 'amazing', 'awesome', 'rainbows', 'unicorns', 'happiness', 'neon', 'bright lights', 'lights', 'beauty', 'positivity'];
+        this.happy = ['happy', 'joy', 'wonderful', 'lovely', 'elated', 'amazing', 'awesome', 'rainbows', 'unicorns', 'happiness', 'bright lights', 'lights', 'beauty', 'positivity'];
         this.worried = ['worried', 'tensed', 'nervous', 'feels like shit', 'talk to me', 'breakdown', 'earthquake', 'tsunami'];
         this.unhappy = ['unhappy', 'sad', 'crying', 'heartbroken', 'grief', 'please', 'depression', 'lonely', 'by myself', "grief", "negative", 'flood', 'catastrophic', 'annoyed', 'disaster', 'bad luck', 'not for me', 'thumbs down'];
         this.hate = ['hate', 'angry', 'anger', 'red', 'awful', 'annoyed', 'irritated', 'death', 'feeling low', 'isolated', 'pure hate', 'red', 'blood', 'negativity', 'nasty'];
@@ -57,6 +57,7 @@ class Agent {
         giphy.search(text, numCols*numRows, this.giphyCallback, random(0, 50));
 
         this.isResponding = false;
+        this.keyWordSearch = false;
     }
 
     run() {   
@@ -86,11 +87,16 @@ class Agent {
             var say, sound;
             var offset = random(0, 50);
 
-            if (this.curHealth > 70) {
-                // Happy, joy, elated search 
-                var text = this.happy[floor(random(0, this.happy.length))];
-                giphy.search(text, numCols*numRows, this.giphyCallback, offset);
-                
+            if (this.curHealth > 70) {      
+                if (!this.keyWordSearch) {
+                    // Skip keyword search
+                    // Happy, joy, elated search 
+                    var text = this.happy[floor(random(0, this.happy.length))];
+                    giphy.search(text, numCols*numRows, this.giphyCallback, offset);
+                } else {
+                    this.keyWordSearch = false;
+                }           
+
                 // Call sound only when I'm not responding.
                 if (random(1) < 0.4 && !this.isResponding) {
                     sound = this.callSounds[floor(random(this.callSounds.length))];
@@ -149,6 +155,7 @@ class Agent {
             
             if (sound != null) {
                 sound.play();
+                centerTitle.setTitle("I'm Listening");
             }
 
             this.speak(say);
