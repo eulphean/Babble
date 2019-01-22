@@ -27,7 +27,7 @@ class Agent {
 
         // Voice sample
         this.sadSamples = ['Is anybody there?', 'Can you compliment me?', 'Please, look at me.', 'Please, can you praise me?', 'Hello?', 'Please, say something nice to me.', 'Are you there?', "I don't want to cry.", "Hello, is somebody there?", "Where is everybody?", "Where are you?", "Happiness is the most tired word in any language.", "Am I that hard to keep happy?", "Come, talk to me.", "Just say, 'Happy', and I am yours.", "Okay. I am really pissed now.", "I am getting angry.", "You are so boring, and uninteresting.", "You make me sad. So sad.", "I am right here. Come say Hi.", "You can do better.", "Please, grow up.", "Bla, bla, bla, bla, bla. You never say nice things to me.", "Please, don't do this to me.", "You annoy me.", "Say something good. Say something.", "Just Babble into me.", "My head hurts. Can you cheer me up?", "Can you cheer me up?", "Why don't you say something nice?", "I hear everything, yet I don't hear what I want to.", "Babble into me.", "Please, just Babble.", "You need me in your life."];
-        this.hateSamples = ["I hate you.", "You, suck.", "Go away.", "I will say one thing to you. I, H, A, TEA, YOU.. I hate you.", "You cannot even say something nice to me?", "There is still time. Say something nice.", "You are so bad.", "This is not a good day for me.", "I am getting angry, now.", "Okay, bye.", "Stop it.", "You are the worst.", "I wish bad things happen to you.", "This is a bad day.", "I hate this.", "Annoyed.", "Urgh, bla bla bla.", "HATE, HATE, AND ONLY HATE.", "Only Hate.", "Bad, bad, bad, bad. Very bad.", "Come on, you can do better than that.", "I am all alone, and nobody is there.", "So lonely. So so lonely.", "Ever so lonely.", "Now, you can see me crying.", "Death is looming upon me, if you don't love me.", "Love is precious. You have none for me.", "I know what you're saying. I can hear you."];
+        this.hateSamples = ["I hate you.", "You, suck.", "Go away.", "I will say one thing to you. I, H, A, TEA, YOU.. I hate you.", "You cannot even say something nice to me?", "There is still time. Say something nice.", "You are so bad.", "This is not a good day for me.", "I am getting angry, now.", "Okay, bye.", "Stop it.", "You are the worst.", "I wish bad things happen to you.", "This is a bad day.", "I hate this.", "Annoyed.", "HATE, HATE, AND ONLY HATE.", "Only Hate.", "Bad, bad, bad, bad. Very bad.", "Come on, you can do better than that.", "I am all alone, and nobody is there.", "So lonely. So so lonely.", "Ever so lonely.", "Now, you can see me crying.", "Death is looming upon me, if you don't love me.", "Love is precious. You have none for me.", "I know what you're saying. I can hear you."];
         this.happySamples = ["I feel great today.", "Thank you for being so nice to me.", "I love you.", "You make me happy.", "Lots of love.", "I feel like I’ve been split open and stuffed with sunshine.", "I am happy. But, are you happy", "And Babble is happy.", "If you come at four in the afternoon, I'll begin to be happy by three.", "If you've got nothing to dance about, find a reason to sing.", "Dream big, and be happy.", "You are such a sugar.", "I love you.", "It's hard not to feel happy when you make someone smile.", "I would do my damn best to be more happy than not.", "Cooool!", "Okay. I hear you", "Thank you, my cute little sunshine.", "Let me shower some love and happiness on you. ", "I might give you a present soon, if you look at me.", "Thanks for that, my love.", "Good things will come to you.", "I shall be very happy from now.", "Awesome. Thanks!", "Wow. This calls for a treat.", "Can you give me a hug? You are so nice.", "Lots of love. Lots of hugs.", "Kisses. Thank you.", "Happiness is rare. Be happy, like me.", "Cute. Thanks.", "You are my precious. Thanks for that.", "Nice tip.", "Please, don't ever leave me. You are my precious.", "I should live with you.", "Love, take me with you."];
 
         // Load sound samples.
@@ -83,7 +83,8 @@ class Agent {
     }
 
     evaluateVoice() {
-        if (millis() - this.curVoiceTime > this.maxVoiceTime) {
+        var t = millis() - this.curVoiceTime; 
+        if (t > this.maxVoiceTime) {
             var say, sound;
             var offset = random(0, 50);
 
@@ -93,9 +94,7 @@ class Agent {
                     // Happy, joy, elated search 
                     var text = this.happy[floor(random(0, this.happy.length))];
                     giphy.search(text, numCols*numRows, this.giphyCallback, offset);
-                } else {
-                    this.keyWordSearch = false;
-                }           
+                }        
 
                 // Call sound only when I'm not responding.
                 if (random(1) < 0.4 && !this.isResponding) {
@@ -109,8 +108,10 @@ class Agent {
                 }
             } else if (this.curHealth < 70 && this.curHealth > 60) {
                 // Worried search.
-                var text = this.worried[floor(random(this.worried.length))];  
-                giphy.search(text, numCols*numRows, this.giphyCallback, offset);
+                if (!this.keyWordSearch) {
+                    var text = this.worried[floor(random(this.worried.length))];  
+                    giphy.search(text, numCols*numRows, this.giphyCallback, offset);
+                }
 
                 // Call sounds or sad samples. 
                 if (random(1) < 0.4 && !this.isResponding) {
@@ -122,8 +123,10 @@ class Agent {
                 }
             } else if (this.curHealth > 30 && this.curHealth < 60){
                 // Unhappy samples. 
-                var text = this.unhappy[floor(random(0, this.unhappy.length))];
-                giphy.search(text, numCols*numRows, this.giphyCallback, offset);
+                if (!this.keyWordSearch) {
+                    var text = this.unhappy[floor(random(0, this.unhappy.length))];
+                    giphy.search(text, numCols*numRows, this.giphyCallback, offset);
+                }
 
                 // Low probability for a call sound
                 if (random(1) < 0.3 && !this.isResponding) {
@@ -134,14 +137,15 @@ class Agent {
                     say = this.sadSamples[floor(random(this.sadSamples.length))];
                 }
             } else {
-                var text; 
-                if (random(1) < 0.5) {
-                    text = this.hate[floor(random(this.hate.length))];
-                } else {
-                    text = this.unhappy[floor(random(this.unhappy.length))];
+                if (!this.keyWordSearch) {
+                    var text; 
+                    if (random(1) < 0.5) {
+                        text = this.hate[floor(random(this.hate.length))];
+                    } else {
+                        text = this.unhappy[floor(random(this.unhappy.length))];
+                    }
+                    giphy.search(text, numCols*numRows, this.giphyCallback, offset);
                 }
-
-                giphy.search(text, numCols*numRows, this.giphyCallback, offset);
 
                 // Crying sounds and hate samples. 
                 if (random(1) < 0.4 && !this.isResponding) {
@@ -161,6 +165,7 @@ class Agent {
             this.speak(say);
             centerTitle.setMiddleScreen();
             this.isResponding = false;
+            this.keyWordSearch = false;
             this.curVoiceTime = millis();
         }
     }

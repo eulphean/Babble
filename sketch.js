@@ -161,30 +161,67 @@ function speechResult(result, isFinal) {
 }
 
 function textAnalyticsResults(sentiment, keyPhrases, originalText) {
-  if (sentiment > 0.6 && agent.curHealth > 70 && keyPhrases.length > 0) {
-    print('Searching specific result. Found keyPhrases and a happy health.');
-    agent.curVoiceTime = millis(); // Reset the time before the agent reevaluates its emotions.
-    // Take all the keywords, create a string, and look them up. 
+  print('Sentiment: ' + sentiment + ' Key Phrases: ' + keyPhrases);
+
+  // if (keyPhrases.length > 0) {
+  //   print('Searching specific result. Found keyPhrases and a happy health.');
+  //   agent.curVoiceTime = millis(); // Reset the time before the agent reevaluates its emotions.
+  //   // Take all the keywords, create a string, and look them up. 
+  //   var text = '';
+  //   keyPhrases.forEach(function(item) {
+  //     text += item + ' '; 
+  //   });
+
+  //   text = text.trim();
+  //   // Start a selective search for these gifs
+  //   giphy.search(text, this.maxGifsToUpdate, this.selectiveResults, 0);
+  // } else {
+  //   if (sentiment >= 0.9) {
+  //     agent.curHealth = 90;
+  //   } else if(sentiment >= 0.7) {
+  //     agent.curHealth = 80; 
+  //   } else if (sentiment >= 0.5 && sentiment < 0.7) {
+  //     agent.curHealth = 60; 
+  //   } else if (sentiment >= 30 && sentiment < 50) {
+  //     agent.curHealth = 40; 
+  //   } else {
+  //     agent.curHealth = 0; 
+  //   }
+
+  //   agent.curVoiceTime = agent.maxVoiceTime + 1; // Force an evaluation
+  //   agent.isResponding = true;
+  //   centerTitle.setMiddleScreen();
+  //   centerTitle.setTitle("I'm Listening");
+  // }
+
+  // Evaluate sentiment
+  // Evaluate keyphrases
+  // If not keyphrase, isResponding = curVoiceTime is great and go
+
+  // Evaluate sentiment 
+  if (sentiment >= 0.9) {
+    agent.curHealth = 90;
+  } else if(sentiment >= 0.7) {
+    agent.curHealth = 80; 
+  } else if (sentiment >= 0.5 && sentiment < 0.7) {
+    agent.curHealth = 60; 
+  } else if (sentiment >= 30 && sentiment < 50) {
+    agent.curHealth = 40; 
+  } else {
+    agent.curHealth = 0; 
+  }
+
+  if (keyPhrases.length > 0) {
+    print('KeyPhrases found');
     var text = '';
     keyPhrases.forEach(function(item) {
       text += item + ' '; 
     });
+
     text = text.trim();
     // Start a selective search for these gifs
     giphy.search(text, this.maxGifsToUpdate, this.selectiveResults, 0);
   } else {
-    if (sentiment >= 0.9) {
-      agent.curHealth = 90;
-    } else if(sentiment >= 0.7) {
-      agent.curHealth = 80; 
-    } else if (sentiment >= 0.5 && sentiment < 0.7) {
-      agent.curHealth = 60; 
-    } else if (sentiment >= 30 && sentiment < 50) {
-      agent.curHealth = 40; 
-    } else {
-      agent.curHealth = 0; 
-    }
-
     agent.curVoiceTime = agent.maxVoiceTime + 1; // Force an evaluation
     agent.isResponding = true;
     centerTitle.setMiddleScreen();
