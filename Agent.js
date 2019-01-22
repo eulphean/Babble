@@ -5,7 +5,7 @@ class Agent {
     constructor(voice, speech, giphyResultsCallback) {
         // When agent has to speak something, it calls utter method on the voice engine. 
         this.voiceEngine = voice;
-        this.curHealth = 100; 
+        this.curHealth = 20; 
         this.maxHealth = 100;  // 100 means happy - 0 means super sad. 
         this.isDead = false;
         this.hasQueried = false;

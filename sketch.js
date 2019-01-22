@@ -178,9 +178,9 @@ function textAnalyticsResults(sentiment, keyPhrases, originalText) {
     } else if(sentiment >= 0.7) {
       agent.curHealth = 80; 
     } else if (sentiment >= 0.5 && sentiment < 0.7) {
-      agent.curHealth = 70; 
+      agent.curHealth = 60; 
     } else if (sentiment >= 30 && sentiment < 50) {
-      agent.curHealth = 50; 
+      agent.curHealth = 40; 
     } else {
       agent.curHealth = 0; 
     }
