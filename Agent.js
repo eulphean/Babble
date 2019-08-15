@@ -12,7 +12,7 @@ class Agent {
 
         // How often does the bot's health decrease. 
         this.curHealthTime = millis();
-        this.maxHealthTime = 10000; // Wait this time before evaluating health.
+        this.maxHealthTime = 8000; // Wait this time before evaluating health.
         this.subtractHealth = 0.3;
 
         // Corpus of health texts that the agent uses at specific intervals of its health.

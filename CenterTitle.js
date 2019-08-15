@@ -41,6 +41,17 @@ class CenterTitle {
 
         // Saved text // Push another.
         this.setTitle("I'm Listening");
+
+        // Create a simple button which one needs to click on to run the app
+        this.startAppButton = createButton('Start Talking');
+        this.startAppButton.position(this.finalPos.x, this.finalPos.y);
+        this.startAppButton.size(this.finalSize.x, this.finalSize.y); 
+        this.startAppButton.style('background-image', 'linear-gradient(to bottom right, #5E0000, #800000)');
+        this.startAppButton.style("color", "#ffbf00");
+        this.startAppButton.style('font-size', '60px');
+        this.startAppButton.mousePressed(() => { // This format binds this pointer
+            this.startAppButton.hide();
+        }); 
     }
 
     run() {
