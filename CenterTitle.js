@@ -43,7 +43,7 @@ class CenterTitle {
         this.setTitle("I'm Listening");
 
         // Create a simple button which one needs to click on to run the app
-        this.startAppButton = createButton('Start Talking');
+        this.startAppButton = createButton('Click Here');
         this.startAppButton.position(this.finalPos.x, this.finalPos.y);
         this.startAppButton.size(this.finalSize.x, this.finalSize.y); 
         this.startAppButton.style('background-image', 'linear-gradient(to bottom right, #5E0000, #800000)');
