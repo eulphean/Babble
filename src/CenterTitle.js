@@ -26,9 +26,9 @@ class CenterTitle {
 
         // Styles. 
         this.el.style("opacity", this.curOpacity);
-        this.el.style("font-family", 'Roboto');
-        this.el.style("letter-spacing", '10px');
-        this.el.style('font-size', '70px');
+        this.el.style("font-family", "'Indie Flower', cursive");
+        this.el.style("letter-spacing", '5px');
+        this.el.style('font-size', '90px');
         this.el.style("color", "#ffbf00");
         this.el.style('display', 'flex');
         this.el.style("align-items", "center");

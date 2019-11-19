@@ -16,7 +16,7 @@ gulp.task('default', function() {
     });
 
     // If any of these files change, reload the browser. 
-    gulp.watch(['src/*.js', './index.html'], function(done) {
+    gulp.watch(['src/*.js', 'Controller/*.js', './index.html'], function(done) {
         console.log('Something changed.. Reload the browser.');
         browserSync.reload();
         done();

@@ -30,7 +30,7 @@ class Speech {
             this.isRunning = false;
             this.stopD = false;
         } else {
-            print("Error: Restart audio."); 
+            print("Error: Restart speech recognition."); 
             this.speechRec.start();
             this.isRunning = true;
         }
