@@ -1,2 +1,2 @@
-# GIF-Wall
-P5.js implementation of a gif wall. 
+# Babble Wall
+Babble is a sentimental bot. Talk to it. 
