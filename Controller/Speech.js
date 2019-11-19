@@ -26,11 +26,11 @@ class Speech {
 
     endAudio() {
         if (this.stopD == true) {
-            print("Stopped speech recognition deliberately.");
+            print("Speech: Stopped speech recognition deliberately.");
             this.isRunning = false;
             this.stopD = false;
         } else {
-            print("Error: Restart speech recognition."); 
+            console.warn("Speech [Error]: Restart speech recognition."); 
             this.speechRec.start();
             this.isRunning = true;
         }
@@ -41,14 +41,14 @@ class Speech {
     }
 
     startAudio() {
-        print("Begin speech recognition.");
+        print("Speech: Begin speech recognition.");
     }
 
     gotSpeech() {
         var result = this.speechRec.resultString; 
         var confidence = this.speechRec.resultConfidence; 
         var isFinal = this.speechRec.isFinal;
-        print(result + ", " + confidence + ", " + isFinal);
+        // print(result + ", " + confidence + ", " + isFinal);
         speechResult(result, isFinal);
     }
 

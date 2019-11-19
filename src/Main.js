@@ -137,7 +137,7 @@ function speechResult(result, isFinal) {
     } else {
       // Only send the text to Text Analytics if the final text length is less than 200 characters.
       if (result.length < 200) {
-        console.log('Sending this to Text Analytics.');
+        print('Main: Sending final speech result to Text Analytics: ' + result);
         var sentiPromise = new Promise(function(resolve, reject) {
           textAnalytics.sentiment(result, resolve);
         });
@@ -148,7 +148,7 @@ function speechResult(result, isFinal) {
           textAnalyticsResults(values[0], values[1].phrases, values[1].originalText);
         });
       } else {
-        print('Ignoring audience, input too long. Maybe say something here?');
+        print('Main: Ignoring audience, input too long. Maybe say something here?');
       }
 
       // Don't reevaluate if it's capturing only junk. Just show that. 
@@ -158,13 +158,13 @@ function speechResult(result, isFinal) {
 }
 
 function textAnalyticsResults(sentiment, keyPhrases, originalText) {
-  print('Sentiment: ' + sentiment + ' Key Phrases: ' + keyPhrases);
+  print('Main: Sentiment: ' + sentiment + ' Key Phrases: ' + keyPhrases);
 
   // Set current health with sentiment. 
   agent.curHealth = sentiment * 100; 
 
   if (keyPhrases.length > 0) {
-    print('KeyPhrases found');
+    print('Main: KeyPhrases found');
     var text = '';
     keyPhrases.forEach(function(item) {
       text += item + ' '; 
@@ -174,7 +174,7 @@ function textAnalyticsResults(sentiment, keyPhrases, originalText) {
     // Start a selective search for these gifs
     giphy.search(text, this.maxGifsToUpdate, this.selectiveResults, 0);
   } else {
-    agent.curVoiceTime = agent.maxVoiceTime + 1; // Force an evaluation
+    agent.curVoiceTime = -agent.maxVoiceTime; // Force the agent to speak something. 
     agent.isResponding = true;
     centerTitle.setMiddleScreen();
     centerTitle.setTitle("I'm Listening");
@@ -214,7 +214,7 @@ function selectiveResults(gData) {
   centerTitle.setMiddleScreen();
   agent.isResponding = true;
   agent.keyWordSearch = true;
-  agent.curVoiceTime = agent.maxVoiceTime + 1; // Force an evaluation
+  agent.curVoiceTime = -agent.maxVoiceTime; // Force an evaluation
 
   // Wait for some time, then load new gifs.  
   setTimeout(setNewGifs, 1000);

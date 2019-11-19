@@ -49,6 +49,7 @@ class CenterTitle {
         this.startAppButton.style('background-image', 'linear-gradient(to bottom right, #5E0000, #800000)');
         this.startAppButton.style("color", "#ffbf00");
         this.startAppButton.style('font-size', '60px');
+        this.startAppButton.style('font-family', "'Indie Flower', cursive");
         this.startAppButton.mousePressed(() => { // This format binds this pointer
             this.startAppButton.hide();
         }); 

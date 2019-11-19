@@ -16,13 +16,13 @@ class Giphy {
         // Create query string. 
         let url = this.searchEndpoint + this.apiKey + this.q + text + this.limit + limit + this.offset + offset;
         loadJSON(url, callback);
-        print("Initiate query for " + text);
+        print("Giphy: Initiate query for: " + text);
     }
 
     trending(limit, callback) {
         // Create query string. 
         let url = this.trendingEndpoint + this.apiKey + this.limit + limit; 
         loadJSON(url, callback);
-        print("Querying trending gifs");
+        print("Giphy: Querying trending gifs");
     }
 }; 

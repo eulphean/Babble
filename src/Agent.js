@@ -7,13 +7,11 @@ class Agent {
         this.voiceEngine = voice;
         this.curHealth = 20; 
         this.maxHealth = 100;  // 100 means happy - 0 means super sad. 
-        this.isDead = false;
-        this.hasQueried = false;
 
         // How often does the bot's health decrease. 
         this.curHealthTime = millis();
         this.maxHealthTime = 8000; // Wait this time before evaluating health.
-        this.subtractHealth = 0.3;
+        this.subtractHealth = 0.5;
 
         // Voice (how often does the bot speak or create sounds to express itself?)
         this.curVoiceTime = millis();
@@ -46,11 +44,14 @@ class Agent {
         this.speechEngine.start();
         this.isSpeaking = false;
         
-        // Search for happy text. 
+        // Search for a happy gif.
         var text = this.happy[floor(random(0, this.happy.length))];
         giphy.search(text, numCols*numRows, this.giphyCallback, random(0, 50));
 
+        // Responding flag is set if the agent is responding to audience's input. 
         this.isResponding = false;
+        // keyWordSearch flag is set if the audience's input had a key word that 
+        // agent will use to populate the gifs. 
         this.keyWordSearch = false;
     }
 
@@ -66,12 +67,7 @@ class Agent {
         if (millis() - this.curHealthTime > this.maxHealthTime) {
             if (this.curHealth >= 0) {
                 this.curHealth -= this.subtractHealth;
-                //print('Cur Health' + this.curHealth);
                 this.curHealthTime = millis();
-                this.isDead = false;
-                this.hasQueried = false;
-            } else {
-                this.isDead = true;
             }
         }
     }
@@ -79,7 +75,8 @@ class Agent {
     evaluateVoice() {
         var t = millis() - this.curVoiceTime; 
         if (t > this.maxVoiceTime) {
-            var say, sound;
+            print('Agent: Time to respond.'); 
+            var say = null; var sound = null; 
             var offset = random(0, 50);
 
             if (this.curHealth > 70) {      
@@ -122,7 +119,7 @@ class Agent {
                     giphy.search(text, numCols*numRows, this.giphyCallback, offset);
                 }
 
-                // Low probability for a call sound
+                // Low probability for a call sound. 
                 if (random(1) < 0.3 && !this.isResponding) {
                     sound = this.callSounds[floor(random(this.callSounds.length))];
                     sound.setVolume(0.7);
@@ -152,12 +149,13 @@ class Agent {
             }
             
             if (sound != null) {
-                console.log('play sound');
+                print('Agent: play sound');
                 sound.play();
                 centerTitle.setTitle("I'm Listening");
             }
-
+            
             this.speak(say);
+
             centerTitle.setMiddleScreen();
             this.isResponding = false;
             this.keyWordSearch = false;
@@ -167,6 +165,8 @@ class Agent {
 
     speak(say) {
         if (say != null) {
+            print('Agent: Saying ' + say);
+
             // Stop speech recognition as soon as it starts speaking. 
             if (this.speechEngine.isRunning) {
                 this.speechEngine.stopD = true;
@@ -174,11 +174,8 @@ class Agent {
             }
             
             // Utter the words. 
-            if (text != null) {
-                this.isSpeaking = true;
-                this.voiceEngine.utter(say);
-                this.noCallSounds = true;
-            }
+            this.isSpeaking = true;
+            this.voiceEngine.utter(say);
         }
     }
 
