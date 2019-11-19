@@ -1,0 +1,24 @@
+{
+  "name": "babble-wall",
+  "version": "1.0.0",
+  "description": "P5.js implementation of a gif wall.",
+  "main": "Agent.js",
+  "dependencies": {
+    "browser-sync": "^2.26.7",
+    "gulp": "^4.0.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eulphean/GIF-Wall.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/eulphean/GIF-Wall/issues"
+  },
+  "homepage": "https://github.com/eulphean/GIF-Wall#readme"
+}
