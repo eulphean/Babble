@@ -130,7 +130,7 @@ class Agent {
             } else {
                 if (!this.keyWordSearch) {
                     var text; 
-                    if (random(1) < 0.5) {
+                    if (random(1) < 0.7) {
                         text = this.hate[floor(random(this.hate.length))];
                     } else {
                         text = this.unhappy[floor(random(this.unhappy.length))];
