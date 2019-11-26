@@ -1,6 +1,6 @@
 class Cakechat {
     constructor(callback) {
-        this.endpoint = "babble-cakechat.xyz:80";
+        this.endpoint = "babble-cakechat.xyz";
         this.uri = "https://" + this.endpoint + "/cakechat_api/v1/actions/get_response";
         this.callback = callback; 
     }
