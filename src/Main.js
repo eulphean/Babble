@@ -14,7 +14,8 @@ var ringSvg = 'assets/ring.svg';
 
 // API controllers. 
 var searchGifLimit = maxGifsToUpdate;
-var giphy, speech, voice, textAnalytics;
+var giphy, speech, voice, textAnalytics, cakechat; 
+var isCakechatEnabled = false; 
 
 // Property to save indexes for future. 
 var newIdxUrls = [];
@@ -49,6 +50,11 @@ function setup() {
   // Create background colors
   initBgColors(); 
 
+  // Cakechat
+  cakechat = new Cakechat(cakechatCallback); 
+  // Fake test to check if cakechat is actually working or not. 
+  cakechat.getResponse("Hi", "neutral", false); 
+
   // Create the controller instance. 
   giphy = new Giphy();
 
@@ -67,7 +73,6 @@ function setup() {
   // Initialize text analytics. 
   textAnalytics = new TextAnalytics(this.sentimentResults, this.keyPhrasesResults); // Pass the callbacks for sentiment and keyPhrases. 
 }
-
 
 function draw() {
   if (initialDraw) {
@@ -88,6 +93,24 @@ function draw() {
   centerTitle.run();
 
   initialDraw = false; 
+}
+
+function cakechatCallback(result, speak) {
+  if (result == "ERROR") {
+    console.log("Cakechat is unavailable."); 
+    isCakechatEnabled = false; 
+    if (speak) {
+      // HANDLE THIS CASE. 
+      // We need to create a response in this case from the fixed 
+      // responses. 
+    }
+  } else {
+    isCakechatEnabled = true;
+    console.log("Cakechat is available."); 
+    if (speak) {
+      console.log('Speaking: ' + result);
+    }
+  }
 }
 
 function giphyResultCallback(gData) {
