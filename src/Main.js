@@ -10,19 +10,19 @@ var gifElements = [];
 var minGifsToUpdate = 15; 
 var bgColors = [];
 var ringSvg = 'assets/ring.svg'; 
-var autoResponseInterval = 10000; // Time interval which the agent speaks in. 
+var autoResponseInterval = 40000; // Time interval which the agent speaks in. 
 
 // API controllers. 
 var giphy, speech, voice, textAnalytics, cakechat; 
 
 // Cakechat 
 var isCakechatEnabled = false; 
-var emotions = {
-  Joy: 'joy',
-  Sadness: 'sadness',
-  Fear: 'fear',
-  Anger: 'anger',
-  Neutral: 'neutral' 
+var Emotion = {
+  joy: 'joy',
+  sadness: 'sadness',
+  fear: 'fear',
+  anger: 'anger',
+  neutral: 'neutral' 
 }; 
 
 // Property to save indexes for future. 
@@ -59,9 +59,10 @@ function setup() {
   initBgColors(); 
 
   // Cakechat
-  cakechat = new Cakechat(cakechatCallback); 
+  cakechat = new Cakechat(); 
   // Fake test to check if cakechat is actually working or not. 
-  cakechat.getResponse("Hi", emotions.Neutral, false); 
+  cakechat.getResponse("Hi", Emotion.neutral, this.cakechatCallback); 
+  setInterval(this.pollCakechat, 180000); // Poll cakechat every 3 minutes to know if it's up. 
 
   // Create the controller instance. 
   giphy = new Giphy();
@@ -103,21 +104,18 @@ function draw() {
   initialDraw = false; 
 }
 
-function cakechatCallback(result, speak) {
+function pollCakechat() {
+  console.log("Main: Polling cakechat to check if it's up");
+  cakechat.getResponse("Hi", Emotion.neutral, this.cakechatCallback);
+}
+
+function cakechatCallback(result, emotion) {
   if (result == "ERROR") {
-    console.log("Cakechat is unavailable."); 
+    console.log("Main: Cakechat is unavailable."); 
     isCakechatEnabled = false; 
-    if (speak) {
-      // HANDLE THIS CASE. 
-      // We need to create a response in this case from the fixed 
-      // responses. 
-    }
   } else {
     isCakechatEnabled = true;
-    console.log("Cakechat is available."); 
-    if (speak) {
-      console.log('Speaking: ' + result);
-    }
+    console.log("Main: Cakechat is available."); 
   }
 }
 
@@ -212,12 +210,8 @@ function speechResult(result, isFinal) {
 function textAnalyticsResults(sentiment, keyPhrases, originalText) {
   print('Main: Sentiment: ' + sentiment + ' Key Phrases: ' + keyPhrases);
 
-  // Create a voice response from the agent. 
-  // Call agent.interactiveRespons(sentiment, originalText)
-  // Check if cakechat is enabled / disabled -> do different things based on that. 
-  // Agent will also response here. 
-  centerTitle.setTitle("I'm Listening");
-  centerTitle.setMiddleScreen();
+  // Create a response from the agent. 
+  agent.interactiveResponse(sentiment, originalText); 
 
   if (keyPhrases.length > 0) {
     print('Main: KeyPhrases found');
@@ -291,39 +285,3 @@ function centerCanvas() {
 function windowResized() {
   centerCanvas();
 }
-
-// else {
-//   agent.curVoiceTime = -agent.maxVoiceTime; // Force the agent to speak something. 
-//   centerTitle.setMiddleScreen();
-//   centerTitle.setTitle("I'm Listening");
-// }
-
-// function selectiveResults(gData) {
-//   // Figure out what say here. 
-//   let numGifsReturned = gData.data.length; 
-//   let maxGifs = numGifsReturned > maxGifsToUpdate ? maxGifsToUpdate : numGifsReturned; 
-//   let numGifsToUpdate = numGifsReturned <= minGifsToUpdate ? numGifsReturned : floor(random(minGifsToUpdate, maxGifs + 1)); 
-
-//   for (let i = 0; i < numGifsToUpdate; i++) {
-//     let idx; 
-//     do {
-//       idx = floor(random(gifElements.length));
-//     } while (newIdxUrls.hasOwnProperty(idx));
-
-//     // Clear the div at that index. 
-//     gifElements[idx].attribute('src', ringSvg);
-
-//     // Create an object {index: url} to update in setNewGifs method. 
-//     var gifUrl = gData.data[i].images.fixed_width_downsampled.url;
-//     newIdxUrls[idx] = gifUrl; 
-//   }
-
-//   centerTitle.setTitle("I'm Listening");
-//   centerTitle.setMiddleScreen();
-//   // agent.isResponding = true;
-//   // agent.keyWordSearch = true;
-//   agent.curVoiceTime = -agent.maxVoiceTime; // Force an evaluation
-
-//   // Wait for some time, then load new gifs.  
-//   setTimeout(setNewGifs, 1000);
-// }
