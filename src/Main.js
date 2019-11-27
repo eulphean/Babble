@@ -11,11 +11,21 @@ var minGifsToUpdate = 15;
 var maxGifsToUpdate = 40; // Maximum gifs a search query can update on the wall. 
 var bgColors = [];
 var ringSvg = 'assets/ring.svg'; 
+var autoResponseInterval = 10000; // Time interval which the agent speaks in. 
 
 // API controllers. 
 var searchGifLimit = maxGifsToUpdate;
 var giphy, speech, voice, textAnalytics, cakechat; 
+
+// Cakechat 
 var isCakechatEnabled = false; 
+var emotions = {
+  Joy: 'joy',
+  Sadness: 'sadness',
+  Fear: 'fear',
+  Anger: 'anger',
+  Neutral: 'neutral' 
+}; 
 
 // Property to save indexes for future. 
 var newIdxUrls = [];
@@ -53,7 +63,7 @@ function setup() {
   // Cakechat
   cakechat = new Cakechat(cakechatCallback); 
   // Fake test to check if cakechat is actually working or not. 
-  cakechat.getResponse("Hi", "neutral", false); 
+  cakechat.getResponse("Hi", emotions.Neutral, false); 
 
   // Create the controller instance. 
   giphy = new Giphy();
@@ -198,7 +208,7 @@ function textAnalyticsResults(sentiment, keyPhrases, originalText) {
     giphy.search(text, this.maxGifsToUpdate, this.selectiveResults, 0);
   } else {
     agent.curVoiceTime = -agent.maxVoiceTime; // Force the agent to speak something. 
-    agent.isResponding = true;
+    // agent.isResponding = true;
     centerTitle.setMiddleScreen();
     centerTitle.setTitle("I'm Listening");
   }
@@ -235,8 +245,8 @@ function selectiveResults(gData) {
 
   centerTitle.setTitle("I'm Listening");
   centerTitle.setMiddleScreen();
-  agent.isResponding = true;
-  agent.keyWordSearch = true;
+  // agent.isResponding = true;
+  // agent.keyWordSearch = true;
   agent.curVoiceTime = -agent.maxVoiceTime; // Force an evaluation
 
   // Wait for some time, then load new gifs.  

@@ -18,13 +18,13 @@ class Cakechat {
     }
 
     onReadyStateChange(request, speak) {
-        if (request.readyState == 4) {
-            if (request.status == 200) {
+        if (request.readyState == 4) { // DONE
+            if (request.status == 200) { // SUCCESS
                 var response = JSON.parse(request.response)['response'];
                 this.callback(response, speak); 
-            } else if (request.status == 0) {
-                // TIMEOUT : We already catch that in 
-            } else {
+            } else if (request.status == 0) { // TIMEOUT
+                // TIMEOUT : We already catch that by registering for that callback. 
+            } else { // ANY OTHER ERROR
                 console.error("Cakechat request failed with error " + request.status);
                 console.log(request);
                 this.callback("ERROR", speak);
