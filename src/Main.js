@@ -8,13 +8,11 @@ var parentDiv;
 var gifWidth, gifHeight;  
 var gifElements = []; 
 var minGifsToUpdate = 15; 
-var maxGifsToUpdate = 40; // Maximum gifs a search query can update on the wall. 
 var bgColors = [];
 var ringSvg = 'assets/ring.svg'; 
 var autoResponseInterval = 10000; // Time interval which the agent speaks in. 
 
 // API controllers. 
-var searchGifLimit = maxGifsToUpdate;
 var giphy, speech, voice, textAnalytics, cakechat; 
 
 // Cakechat 
@@ -124,9 +122,27 @@ function cakechatCallback(result, speak) {
 }
 
 function giphyResultCallback(gData) {
-  let numGifsToUpdate = numRows*numCols;
-  for (var i = 0; i < numGifsToUpdate; i++) {
-    newIdxUrls[i] = gData.data[i].images.fixed_width_downsampled.url;
+  let numGifsReturned = gData.data.length;
+  let maxGifsToUpdate = numRows*numCols; 
+
+  if (numGifsReturned < maxGifsToUpdate) {
+    // Didn't find enough gifs with search query. Only update a few on the screen. 
+    for (let i = 0; i < numGifsReturned; i++) {
+      let idx; 
+      do {
+        idx = floor(random(gifElements.length));
+      } while (newIdxUrls.hasOwnProperty(idx));
+      // Clear the div at that index. 
+      gifElements[idx].attribute('src', ringSvg);
+      //Create an object {index: url} to update in setNewGifs method. 
+      newIdxUrls[i] = gData.data[i].images.fixed_width_downsampled.url;
+    }
+  } else {
+    // Found enough gifs with new search query. Update all of them. 
+    for (var i = 0; i < maxGifsToUpdate; i++) {
+      gifElements[i].attribute('src', ringSvg);
+      newIdxUrls[i] = gData.data[i].images.fixed_width_downsampled.url;
+    }
   }
 
   // NOTE: Keep this here, don't remove it. It needs to be here. 
@@ -163,14 +179,15 @@ function speechResult(result, isFinal) {
         agent.voiceEngine.stop();
       }
 
-      // Keep resetting the agent's time. 
+      // Reset agent's auto response time. 
+      // Set the speech result into the window. 
       agent.curVoiceTime = millis();
       centerTitle.setFullScreen();
       centerTitle.setTitle(result);
     } else {
-      // Only send the text to Text Analytics if the final text length is less than 200 characters.
+      // Don't send a very long message to Text Analytics. This is probably junk.
       if (result.length < 200) {
-        print('Main: Sending final speech result to Text Analytics: ' + result);
+        print('Main: Sending final speech result to Text Analytics - ' + result);
         var sentiPromise = new Promise(function(resolve, reject) {
           textAnalytics.sentiment(result, resolve);
         });
@@ -185,6 +202,8 @@ function speechResult(result, isFinal) {
       }
 
       // Don't reevaluate if it's capturing only junk. Just show that. 
+      // This will automatically get reset when the agent auto responds next time. 
+      // If this result is sent to Text Analytics, then it is reset in that code path (look below)
       centerTitle.setTitle(result);
     }
   }
@@ -193,25 +212,32 @@ function speechResult(result, isFinal) {
 function textAnalyticsResults(sentiment, keyPhrases, originalText) {
   print('Main: Sentiment: ' + sentiment + ' Key Phrases: ' + keyPhrases);
 
-  // Set current health with sentiment. 
-  agent.curHealth = sentiment * 100; 
+  // Create a voice response from the agent. 
+  // Call agent.interactiveRespons(sentiment, originalText)
+  // Check if cakechat is enabled / disabled -> do different things based on that. 
+  // Agent will also response here. 
+  centerTitle.setTitle("I'm Listening");
+  centerTitle.setMiddleScreen();
 
   if (keyPhrases.length > 0) {
     print('Main: KeyPhrases found');
-    var text = '';
-    keyPhrases.forEach(function(item) {
-      text += item + ' '; 
-    });
-
-    text = text.trim();
-    // Start a selective search for these gifs
-    giphy.search(text, this.maxGifsToUpdate, this.selectiveResults, 0);
+    var text = getGiphyTextToSearch(keyPhrases); 
+    giphy.search(text, numCols*numRows, this.giphyResultCallback, random(0, 200));
   } else {
-    agent.curVoiceTime = -agent.maxVoiceTime; // Force the agent to speak something. 
-    // agent.isResponding = true;
-    centerTitle.setMiddleScreen();
-    centerTitle.setTitle("I'm Listening");
+    print('Main: No KeyPhrases found. Use the original text to extract key phrases.');
+    keyPhrases = originalText.split(' '); 
+    var text = getGiphyTextToSearch(keyPhrases);
+    giphy.search(text, numCols*numRows, this.giphyResultCallback, random(0, 200));
   }
+}
+
+function getGiphyTextToSearch(keyPhrases) {
+  var text = '';
+  keyPhrases.forEach(function(item) {
+    text += item + ' '; 
+  });
+  text = text.trim();
+  return text; 
 }
 
 function setNewGifs() {
@@ -221,36 +247,6 @@ function setNewGifs() {
   } 
   // Clear the old object. 
   newIdxUrls = [];
-}
-
-function selectiveResults(gData) {
-  // Figure out what say here. 
-  let numGifsReturned = gData.data.length; 
-  let maxGifs = numGifsReturned > maxGifsToUpdate ? maxGifsToUpdate : numGifsReturned; 
-  let numGifsToUpdate = numGifsReturned <= minGifsToUpdate ? numGifsReturned : floor(random(minGifsToUpdate, maxGifs + 1)); 
-
-  for (let i = 0; i < numGifsToUpdate; i++) {
-    let idx; 
-    do {
-      idx = floor(random(gifElements.length));
-    } while (newIdxUrls.hasOwnProperty(idx));
-
-    // Clear the div at that index. 
-    gifElements[idx].attribute('src', ringSvg);
-
-    // Create an object {index: url} to update in setNewGifs method. 
-    var gifUrl = gData.data[i].images.fixed_width_downsampled.url;
-    newIdxUrls[idx] = gifUrl; 
-  }
-
-  centerTitle.setTitle("I'm Listening");
-  centerTitle.setMiddleScreen();
-  // agent.isResponding = true;
-  // agent.keyWordSearch = true;
-  agent.curVoiceTime = -agent.maxVoiceTime; // Force an evaluation
-
-  // Wait for some time, then load new gifs.  
-  setTimeout(setNewGifs, 1000);
 }
 
 function initBgColors() {
@@ -295,3 +291,39 @@ function centerCanvas() {
 function windowResized() {
   centerCanvas();
 }
+
+// else {
+//   agent.curVoiceTime = -agent.maxVoiceTime; // Force the agent to speak something. 
+//   centerTitle.setMiddleScreen();
+//   centerTitle.setTitle("I'm Listening");
+// }
+
+// function selectiveResults(gData) {
+//   // Figure out what say here. 
+//   let numGifsReturned = gData.data.length; 
+//   let maxGifs = numGifsReturned > maxGifsToUpdate ? maxGifsToUpdate : numGifsReturned; 
+//   let numGifsToUpdate = numGifsReturned <= minGifsToUpdate ? numGifsReturned : floor(random(minGifsToUpdate, maxGifs + 1)); 
+
+//   for (let i = 0; i < numGifsToUpdate; i++) {
+//     let idx; 
+//     do {
+//       idx = floor(random(gifElements.length));
+//     } while (newIdxUrls.hasOwnProperty(idx));
+
+//     // Clear the div at that index. 
+//     gifElements[idx].attribute('src', ringSvg);
+
+//     // Create an object {index: url} to update in setNewGifs method. 
+//     var gifUrl = gData.data[i].images.fixed_width_downsampled.url;
+//     newIdxUrls[idx] = gifUrl; 
+//   }
+
+//   centerTitle.setTitle("I'm Listening");
+//   centerTitle.setMiddleScreen();
+//   // agent.isResponding = true;
+//   // agent.keyWordSearch = true;
+//   agent.curVoiceTime = -agent.maxVoiceTime; // Force an evaluation
+
+//   // Wait for some time, then load new gifs.  
+//   setTimeout(setNewGifs, 1000);
+// }

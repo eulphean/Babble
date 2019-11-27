@@ -7,7 +7,7 @@ class Agent {
         this.searchTexts = ["miss", "cry", "lost", "sad", "crying"]; 
 
         // Responses used when Babble speaks up occassionally. 
-        this.callTexts = ["Are you there?", "What you doing?", "Whatsup?", "HOLAAAA", "Hello?", "Anybody there?", "What's good today?", "Hey Boy, Hey Girl"];
+        this.callTexts = ["Are you there?", "What you doing?", "Whatsup?", "HOLAAAA", "Hello?", "Anybody there?", "What's good today?"];
 
         // Hardcoded responses based on the emotion Babble will respond with. 
         this.joy = [];
@@ -39,67 +39,6 @@ class Agent {
         giphy.search(text, numCols*numRows, this.giphyCallback, random(0, 50)); 
     }
 
-    run() {   
-        var elapsedTime = millis() - this.curVoiceTime; 
-        if (elapsedTime > autoResponseInterval) {
-            this.createAutoResponse();
-        }
-    }
-
-    interactiveResponse() {
-        // Cakechat or Harcoded text
-        // Black box for the response. 
-    }
-
-    createAutoResponse() {
-        print("Agent: Create Auto Response."); 
-            
-        // Time for agent to speak something. 
-        var response = null; var sound = null; 
-        var giphyOffset = random(0, 50);
-
-        // Based on an equal probability, pick a random call text or a call sound. 
-        if (random(1) < 0.5) {
-            response = this.callTexts[floor(random(0, this.callTexts.length))]; 
-        } else {
-            sound = this.callSounds[floor(random(this.callSounds.length))];
-        }
-
-        // Select a random giphyText
-        var giphyText = this.searchTexts[floor(random(0, this.searchTexts.length))]; 
-        giphy.search(giphyText, numCols*numRows, this.giphyCallback, random(0, 50)); 
-
-        if (sound != null) {
-            print('Agent: Play Sound');
-            sound.play();
-            centerTitle.setTitle("I'm Listening");
-        }
-        
-        if (response != null) {
-            print('Agent: Speak ' + response);
-            this.speak(response);
-        }
-
-        centerTitle.setMiddleScreen();
-        // this.isResponding = false;
-        // this.keyWordSearch = false;
-        this.curVoiceTime = millis();  
-    }
-
-    speak(say) {
-        if (say != null) {
-            // Stop speech recognition as soon as it starts speaking. 
-            if (this.speechEngine.isRunning) {
-                this.speechEngine.stopD = true;
-                this.speechEngine.stop();
-            }
-            
-            // Utter the words. 
-            this.isSpeaking = true;
-            this.voiceEngine.utter(say);
-        }
-    }
-
     loadSounds() {
         var sound;
 
@@ -118,6 +57,65 @@ class Agent {
         this.notificationSounds.push(sound);
         sound = loadSound('assets/notification2.wav');
         this.notificationSounds.push(sound); 
+    }
+
+    run() {   
+        var elapsedTime = millis() - this.curVoiceTime; 
+        if (elapsedTime > autoResponseInterval) {
+            this.createAutoResponse();
+        }
+    }
+
+    interactiveResponse() {
+        // Cakechat or Harcoded text
+        // Black box for the response. 
+    }
+
+    createAutoResponse() {
+        print("Agent: Create Auto Response."); 
+            
+        // Time for agent to speak something. 
+        var response = null; var sound = null; 
+        var giphyOffset = random(0, 200);
+
+        // Based on an equal probability, pick a random call text or a call sound. 
+        if (random(1) < 0.8) {
+            response = this.callTexts[floor(random(0, this.callTexts.length))]; 
+        } else {
+            sound = this.callSounds[floor(random(this.callSounds.length))];
+        }
+
+        // Select a random giphyText
+        var giphyText = this.searchTexts[floor(random(0, this.searchTexts.length))]; 
+        giphy.search(giphyText, numCols*numRows, this.giphyCallback, giphyOffset); 
+
+        if (sound != null) {
+            print('Agent: Play Sound');
+            sound.play();
+            centerTitle.setTitle("I'm Listening");
+        }
+        
+        if (response != null) {
+            print('Agent: Speak ' + response);
+            this.speak(response);
+        }
+
+        centerTitle.setMiddleScreen();
+        this.curVoiceTime = millis();  
+    }
+
+    speak(say) {
+        if (say != null) {
+            // Stop speech recognition as soon as it starts speaking. 
+            if (this.speechEngine.isRunning) {
+                this.speechEngine.stopD = true;
+                this.speechEngine.stop();
+            }
+            
+            // Utter the words. 
+            this.isSpeaking = true;
+            this.voiceEngine.utter(say);
+        }
     }
 }
 
