@@ -10,7 +10,7 @@ var gifElements = [];
 var minGifsToUpdate = 15; 
 var bgColors = [];
 var ringSvg = 'assets/ring.svg'; 
-var autoResponseInterval = 40000; // Time interval which the agent speaks in. 
+var autoResponseInterval = 40000; // Every 40 seconds, Babble wakes up.
 
 // API controllers. 
 var giphy, speech, voice, textAnalytics, cakechat; 
