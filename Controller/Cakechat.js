@@ -12,6 +12,7 @@ class Cakechat {
         request.open('POST', this.uri, true);
         request.setRequestHeader("Content-Type", "application/json");
         request.setRequestHeader("Accept","application/json");
+        request.setRequestHeader("Access-Control-Allow-Origin", "*");
         var body = {'context': [context], 'emotion': emotion}; 
         request.send(JSON.stringify(body));
     }
